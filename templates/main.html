@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% include "head.html" %}
+	<body>
+		<div class="row divider">
+			<div class="col-md-1"></div>
+			<div class="col-md-10 bg-light main">
+				{% block content %}
+				{% endblock %}
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+	</body>
+</html>
