@@ -54,7 +54,7 @@ ROOT_URLCONF = 'Eventak.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['/root/Desktop/Eventak/Eventak/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

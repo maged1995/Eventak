@@ -1,11 +1,8 @@
 from django.http import HttpResponse
 from django.template import loader
 
-from .models import Question
-
-
 def index(request):
-    template = loader.get_template('Eventak/index.html')
+    template = loader.get_template('index.html')
     context = {
         
     }
