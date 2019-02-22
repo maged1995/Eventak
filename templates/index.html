@@ -1,27 +1,12 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    {% include "head.html" %}
-    <title>Hello</title>
-  </head>
-
-  <body>
-    <header>
-
-    </header>
-    <main class="row divider">
-      <div class="col-md-2 bg-light"></div>
-      <div class="col-md-8 bg-secondary">
-        <div class="col-md-1"></div>
-        <div class="col-md-12 bg-primary">
-          <h1> Hola </h1>
-        </div>
-        <div class="col-md-1"></div>
-      </div>
-      <div class="col-md-2 bg-light"></div>
-    </main>
-    <div id="footer">
-
-    </div>
-  </body>
-</html>
+{% extends "main.html" %}
+{% block content %}
+<div class="col-md-2 bg-light"></div>
+<div class="col-md-8 bg-secondary">
+  <div class="col-md-1"></div>
+  <div class="col-md-12 bg-primary">
+    <h1> Hola </h1>
+  </div>
+  <div class="col-md-1"></div>
+</div>
+<div class="col-md-2 bg-light"></div>
+{% endblock %}

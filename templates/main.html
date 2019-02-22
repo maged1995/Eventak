@@ -4,11 +4,8 @@
 	<body>
     {% include "header.html" %}
 		<div class="row divider">
-			<div class="col-md-1"></div>
-			<div class="col-md-10 bg-light main">
-
-			</div>
-			<div class="col-md-1"></div>
+      {% block content %}
+			{% endblock %}
 		</div>
 	</body>
 </html>
