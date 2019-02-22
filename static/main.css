@@ -1,0 +1,8 @@
+.divider{
+  height:100%;
+  background-color: blue;
+}
+
+body,html{
+  height:100%;
+}
