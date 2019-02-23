@@ -8,8 +8,8 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-def index(request):
-    template = loader.get_template('login.html')
+def login(request):
+    template = loader.get_template('Login.html')
     context = {
 
     }
