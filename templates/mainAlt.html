@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include "head.html" %}
+  </head>
+	<body>
+    {% include "header.html" %}
+    <div id="map"></div>
+		<div class="row divider">
+      <div class="col-md-2 bg-light"></div>
+      <div class="col-md-8 bg-secondary">
+        {% block content %}
+			  {% endblock %}
+      </div>
+      <div class="col-md-2 bg-light"></div>
+		</div>
+	</body>
+</html>
