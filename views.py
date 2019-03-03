@@ -3,7 +3,7 @@ from django.template import loader
 
 def index(request):
     template = loader.get_template('index.html')
-
+    
     Events = {
                 "Events":[{"name":"Amr Diab",
                       "Location":"Cairo festival concert",
