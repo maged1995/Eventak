@@ -1,8 +1,71 @@
 {% extends "main.html" %}
 {% block content %}
-  <div class="col-md-1"></div>
-  <div class="col-md-12 bg-secondary">
-    <h1> Hola </h1>
-  </div>
-  <div class="col-md-1"></div>
+    <h1><B><I><u><p>Upcoming Events:</p></u></I></B></h1>
+    <!-- Automatic Slideshow Images -->
+
+    {% for Event in Events %}
+    <div class="mySlides w3-display-container w3-center">
+      <img src="/static/{{Event.img}}" style="Height:565px ">
+      <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
+        <h3>{{Event.name}}</h3>
+        <p><b>{{Event.loc}}</b></p>
+      </div>
+    </div>
+    {% endfor %}
+
+    <h1><B><I><u><p>Hot Events:</p></u></I></B></h1>
+    <br/>
+    <div class="w3-row-padding">
+
+    </div>
+    <div class="row divider">
+    {% for Event in Events %}
+    <div class="col-4 container w3-margin-bottom">
+      <img src="/static/{{Event.img}}" alt="Cairo festival city" style="width:100%" class="w3-hover-opacity">
+      <div class="w3-container w3-white"><br/>
+        <p><b>{{Event.name}}</b></p>
+        <p>{{Event.desc}}</p>
+		<form action="buy.html">
+		<button class="w3-button w3-block w3-black w3-padding-16 w3-section w3-right">Buy ticket<i class="fa fa-check"></i></button>
+		</form>
+      </div>
+    </div>
+    {% endfor %}
+    </div>
+    <script>
+      var myIndex = 0;
+      carousel();
+
+      function carousel() {
+          var i;
+          var x = document.getElementsByClassName("mySlides");
+          for (i = 0; i < x.length; i++) {
+             x[i].style.display = "none";
+          }
+          myIndex++;
+          if (myIndex > x.length) {myIndex = 1}
+          x[myIndex-1].style.display = "block";
+          setTimeout(carousel, 2000);
+      }
+
+      // Used to toggle the menu on small screens when clicking on the menu button
+      function myFunction() {
+          var x = document.getElementById("navDemo");
+          if (x.className.indexOf("w3-show") == -1) {
+              x.className += " w3-show";
+          } else {
+              x.className = x.className.replace(" w3-show", "");
+          }
+      }
+
+      // When the user clicks anywhere outside of the modal, close it
+      var modal = document.getElementById('ticketModal');
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+    </script>
+
+
 {% endblock %}

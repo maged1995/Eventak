@@ -1,4 +1,4 @@
-  create database Eventak;
+  create database Eventak2;
 
   create table users(
     id int not null auto_increment, email varchar(40) not null,
@@ -17,7 +17,7 @@
   create table events(
     id int not null auto_increment, name varchar(50) not null,
     locLong varchar(10) not null, locLat varchar(10) not null,
-    CreatorID int not null, day date, primary key(id)
+    booking boolean, CreatorID int not null, day date, primary key(id)
   );
 
   create table eventTypes(
