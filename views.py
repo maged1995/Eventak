@@ -1,9 +1,16 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.template import loader
+from Eventak2.models import Users
 
 def index(request):
     template = loader.get_template('index.html')
-    
+    if not 'login' in request.session:
+        request.session['login']=''
+    if not 'state' in request.session:
+        state = ''.join(random.choice(string.ascii_uppercase +
+                                string.digits) for x in range(32))
+        request.session['state']=state
     Events = {
                 "Events":[{"name":"Amr Diab",
                       "Location":"Cairo festival concert",
@@ -29,14 +36,78 @@ def index(request):
                       "Location":"Cairo opera house concert",
                       "img":"angham.jpg", 'desc':"""Buy tickets for
                        Omar khairat's next opera concert at 29 of
-                       september 2019."""}]
+                       september 2019."""}],
+                "login": request.session["login"],
 
     }
     return HttpResponse(template.render(Events, request))
 
 def login(request):
-    template = loader.get_template("Login.html")
-    context = {
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        res = {}
+        usres = Users.objects.all().filter(username=username)
+        if(usres):
+            us=usres[0]
+            print(usres)
+            if us.verify_password(request.POST.get('password', None)):
 
+                template = loader.get_template("index.html")
+                res={
+                    'login':'success',
+                    'UserInfo':{
+                        'username':us.username,
+                        'email':us.email,
+                        'profilePic':us.profilePic,
+                        #'birthDate':us.birthDate
+                    }
+                }
+                request.session['login'] = res
+                return redirect('/', res)
+            else:
+                res = {
+                    'login':'fail'
+                }
+                template = loader.get_template("Login.html")
+                return redirect("/login/")
+            print(res)
+            #return JsonResponse(res)
+        else:
+            template = loader.get_template("Login.html")
+            return redirect("/login/")
+
+    elif request.method == 'GET':
+        template = loader.get_template("Login.html")
+        '''u = Users(birthDate="1995-06-21",username = "maged95")
+        u.hash_password("Leila")
+        u.save()'''
+        res = Users.objects.all().filter(username="maged95")
+        print(res)
+        context = {
+            'users':res
+        }
+        return HttpResponse(template.render(context, request))
+
+def Signup(request):
+    """if request.method == "POST":
+        res1 = Users.objects.filter(username=request.POST.get("username")"""
+    if request.method == "GET":
+        template = loader.get_template("Signup.html")
+        context = {
+
+        }
+        return HttpResponse(template.render(context, request))
+
+def PhoneLogin(request):
+    if request.method == "POST":
+        print("nol")
+
+def validate_username(request):
+    username = request.GET.get('username', None)
+    data = {
+        'is_taken': Users.objects.filter(username=username).exists()
     }
-    return HttpResponse(template.render(context, request))
+    print(data)
+    if data['is_taken']:
+        data['error_message'] = 'A user with this username already exists.'
+    return JsonResponse(data)

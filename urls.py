@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from . import views
+from . import views, Phone
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('Login/', views.login, name='login'),
+    path('login/', views.login, name='login'),
+    path('signup/', views.Signup, name='Signup'),
+    path('Loginm/', Phone.login, name='Phonelogin'),
+    path('ajax/validate_username/', views.validate_username, name='validate_username'),
+
 ]

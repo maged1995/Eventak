@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+
+{% block javascript %}
+
+{% endblock %}
+
+{% block content %}
+<h1 class="title">Sign Up</h1>
+<form method="post" action="/Signup/" data-validate-username-url="/ajax/validate_username/">{% csrf_token %}
+  <label for="username">Email or Username: </label>{{ form.as_p }}<input type="text" placeholder="Email or Password..." name="username" id="id_username" class="js-validate-username"/><br/>
+  <label for="password">Password: </label><input type="password" placeholder="Username.." name="password"/><br/>
+  <input type="submit" value="login"/>
+</form>
+
+<script>
+  $("#id_username").change(function () {
+      var form = $("form");
+      $.ajax({
+        url: form.attr("data-validate-username-url"),
+        data: form.serialize(),
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_taken) {
+            alert(data.error_message);
+          }
+        }
+      });
+
+    });
+</script>
+<!-- google, facebook, and other login api's will be here -->
+{% endblock %}

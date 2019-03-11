@@ -1,35 +1,45 @@
 from django.db import models
+from passlib.apps import custom_app_context as pwd_context
 
-class User(models.Model):
-    id = models.AutoField(primary_key=True),
-    email = models.EmailField(unique=True, blank=False),
-    username = models.CharField(max_length=24, unique=True, blank=False),
-    passwordHash = models.CharField(max_length=32, blank=False),
+class Users(models.Model):
+    id = models.AutoField(primary_key=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    username = models.CharField(max_length=24, unique=True, null=True, blank=True)
+    passwordHash = models.CharField(max_length=32, null=True, blank=True)
+    profilePic = models.TextField()
     birthDate = models.DateField()
+    
+    def hash_password(self, password):
+        self.passwordHash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.passwordHash)
 
 class RelStat(models.Model):
-    f1id = models.ForeignKey('Users'),
-    f2id = models.ForeignKey('Users'),
-    stat = models.IntegerField(blank=False)
+    f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE)
+    f2id = models.ForeignKey('Users', related_name= 'p2', on_delete=models.CASCADE)
+    stat = models.IntegerField(null=True, blank=True)
 
-class Event(models.Model):
-    id = models.AutoField(primary_key=True),
-    name = models.CharField(max_length=50, blank=False),
-    locLong = models.CharField(max_length=10, blank=False),
-    locLat = models.CharField(max_length=510, blank=False),
-    booking = models.BooleanField(),
-    CreatorID = models.ForeignKey('Users'),
-    day = birthDate = models.DateField()
+class Events(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, null=True, blank=True)
+    description = models.TextField()
+    location = models.CharField(max_length=50)
+    locLong = models.CharField(max_length=10, null=True, blank=True)
+    locLat = models.CharField(max_length=510, null=True, blank=True)
+    booking = models.BooleanField()
+    CreatorID = models.ForeignKey('Users', on_delete=models.CASCADE)
+    day = models.DateField()
 
-class EventType(models.Model):
-    id = models.AutoField(primary_key=True),
-    name = models.CharField(max_length=15, blank=False)
+class EventTypes(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=15, null=True, blank=True)
 
 class UserPref(models.Model):
-    uid = models.ForeignKey('Users'),
-    etid = models.ForeignKey('EventTypes')
+    uid = models.ForeignKey('Users', on_delete=models.CASCADE)
+    etid = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
 
 class UserEvent(models.Model):
-    uid = models.ForeignKey('Users'),
-    eid = models.ForeignKey('Events'),
-    stat = models.IntegerField(blank=False)
+    uid = models.ForeignKey('Users', on_delete=models.CASCADE)
+    eid = models.ForeignKey('Events', on_delete=models.CASCADE)
+    stat = models.IntegerField(null=True, blank=True)
