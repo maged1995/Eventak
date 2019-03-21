@@ -71,7 +71,7 @@ def login(request):
                 }
                 template = loader.get_template("Login.html")
                 return redirect("/login/")
-            print(res)
+            #print(res)
             #return JsonResponse(res)
         else:
             template = loader.get_template("Login.html")
@@ -83,7 +83,7 @@ def login(request):
         u.hash_password("Leila")
         u.save()'''
         res = Users.objects.all().filter(username="maged95")
-        print(res)
+        #print(res)
         context = {
             'users':res
         }
