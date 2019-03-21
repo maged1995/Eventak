@@ -23,9 +23,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('login/', views.login, name='login'),
     path('signup/', views.Signup, name='Signup'),
-    path('Loginm/', Phone.login, name='Phonelogin'),
+    path('loginm/', Phone.login, name='Phonelogin'),
     path('ajax/validate_username/', views.validate_username, name='validate_username'),
-    path('ajax/get_Days_Num/', views.GetDaysNum, name='validate_username'),
-
-
+    
 ]
