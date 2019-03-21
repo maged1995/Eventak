@@ -9,7 +9,8 @@ class Users(models.Model):
     passwordHash = models.CharField(max_length=32, null=True, blank=True)
     profilePic = models.TextField()
     birthDate = models.DateField()
-    
+    phoneNumber = models.TextField()
+
     def hash_password(self, password):
         self.passwordHash = pwd_context.encrypt(password)
 

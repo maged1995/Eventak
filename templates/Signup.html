@@ -6,27 +6,63 @@
 
 {% block content %}
 <h1 class="title">Sign Up</h1>
-<form method="post" action="/Signup/" data-validate-username-url="/ajax/validate_username/">{% csrf_token %}
+<form method="post" action="/signup/" data-validate-username-url="/ajax/validate_username/" data-validate-daysNum-url="/ajax/get_Days_Num/">{% csrf_token %}
+  <label>{{request.session.Reg_failure.username}}</label><br/>
   <label for="username">Email or Username: </label>{{ form.as_p }}<input type="text" placeholder="Email or Password..." name="username" id="id_username" class="js-validate-username"/><br/>
   <label for="password">Password: </label><input type="password" placeholder="Username.." name="password"/><br/>
+  <label for="Month">Birth Date:
+    <select name='Month' id="Month" class="js-validate-Month">
+      <option value=''>Select Month</option>
+      {% for i in months %}
+      <option value='{{i}}'>{{i}}</option>
+      {% endfor  %}
+    </select>
+    <select name='Day'>
+      <option value=''>Select Day</option>
+      {% for i in days %}
+      <option value='{{i}}'>{{i}}</option>
+      {% endfor  %}
+    </select>
+    <select name='Year'>
+      <option value=''>Select year</option>
+      {% for i in years %}
+      <option value='{{i}}'>{{i}}</option>
+      {% endfor  %}
+    </select>
+  </label> <br/>
   <input type="submit" value="login"/>
 </form>
 
 <script>
   $("#id_username").change(function () {
-      var form = $("form");
-      $.ajax({
-        url: form.attr("data-validate-username-url"),
-        data: form.serialize(),
-        dataType: 'json',
-        success: function (data) {
-          if (data.is_taken) {
-            alert(data.error_message);
-          }
+    var form = $("form");
+    $.ajax({
+      url: form.attr("data-validate-username-url"),
+      data: form.serialize(),
+      dataType: 'json',
+      success: function (data) {
+        if (data.is_taken) {
+          alert(data.error_message);
         }
-      });
-
+      }
     });
+  });
+
+  $("#Month").change(function () {
+    var form = $("form");
+    $.ajax({
+      url: form.attr("data-validate-daysNum-url"),
+      data: 'csrfmiddlewaretoken={{csrf_token}}&m='+$("#Month").val(),
+      type: "POST",
+      dataType: 'json',
+      success: function (data) {
+        alert( $("#Month").val())
+        if (data.is_taken) {
+          alert(data.error_message);
+        }
+      }
+    });
+  });
 </script>
 <!-- google, facebook, and other login api's will be here -->
 {% endblock %}

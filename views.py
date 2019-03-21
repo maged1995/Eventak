@@ -90,8 +90,13 @@ def login(request):
         return HttpResponse(template.render(context, request))
 
 def Signup(request):
-    """if request.method == "POST":
-        res1 = Users.objects.filter(username=request.POST.get("username")"""
+    if request.method == "POST":
+        res1 = Users.objects.filter(username=request.POST.get("username"))
+        if res1:
+            request.session['Reg_failure'] = {'username':"Server Knows it's Taken"}
+            return redirect('/signup/')
+        '''VALIDATE PHONENUMBER IS ALL NUMBERS
+        VALIDATE DAYS IN MONTH'''
     if request.method == "GET":
         template = loader.get_template("Signup.html")
         context = {
