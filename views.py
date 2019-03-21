@@ -1,7 +1,8 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak2.models import Users
+from Eventak.models import Users
+import random, string
 
 def index(request):
     template = loader.get_template('index.html')

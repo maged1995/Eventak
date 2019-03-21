@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 """
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from Eventak2.models import Users
+from Eventak.models import Users
 
 def login(request):
     username = request.POST.get('username')
