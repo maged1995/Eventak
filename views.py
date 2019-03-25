@@ -104,10 +104,6 @@ def Signup(request):
         }
         return HttpResponse(template.render(context, request))
 
-def PhoneLogin(request):
-    if request.method == "POST":
-        print("nol")
-
 def validate_username(request):
     username = request.GET.get('username', None)
     data = {

@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 <h1 class="title">Sign in</h1>
-<form method="post" action="/loginm/">{% csrf_token %}
+<form method="post" action="/login/">{% csrf_token %}
   <label for="username">Email or Username: </label><input type="text" placeholder="Email or Password..." name="username"/><br/>
   <label for="password">Password: </label><input type="password" placeholder="Password.." name="password"/><br/>
   <input type="submit" value="login"/>
