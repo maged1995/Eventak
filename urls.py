@@ -15,8 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from . import views, Phone
+from rest_framework import routers
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,6 +25,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('signup/', views.Signup, name='Signup'),
     path('loginm/', Phone.login, name='Phonelogin'),
-    path('ajax/validate_username/', views.validate_username, name='validate_username'),
+    path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
     
 ]

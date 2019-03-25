@@ -13,23 +13,28 @@ from Eventak.models import Users
 def login(request):
     username = request.POST.get('username')
     usres = Users.objects.all().filter(username=username)
-    us=usres[0]
-    print(usres)
-    res = ''
-    if us.verify_password(request.POST.get('password', None)):
-        res={
-            'login':'success',
-            'UserInfo':{
-                'username':us.username,
-                'email':us.email,
-                'profilePic':us.profilePic,
-                'birthDate':us.birthDate
-            }
-        }
+    if(usres):
+        us=usres[0]
+        print(usres)
+        res = ''
+        if us.verify_password(request.POST.get('password', None)):
+                res={
+                'login':'success',
+                'UserInfo':{
+                        'username':us.username,
+                        'email':us.email,
+                        'profilePic':us.profilePic,
+                        #'birthDate':us.birthDate
+                }
+                }
+        else:
+                res = {
+                        'login':'fail'
+                }
+        print(res)
     else:
         res = {
-            'login':'fail'
+                'login':'fail'
         }
-    print(res)
     return JsonResponse(res)
     #return HttpResponse(template.render(res, request))

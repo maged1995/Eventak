@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 from django.db import models
-from passlib.apps import custom_app_context as pwd_context
+from passlib.apps import django_context as pwd_context
 
 class Users(models.Model):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=True, blank=True)
     username = models.CharField(max_length=24, unique=True, null=True, blank=True)
-    passwordHash = models.TextField(max_length=32, null=True, blank=True)
+    passwordHash = models.CharField(max_length=86, null=True, blank=True)
     profilePic = models.TextField()
     birthDate = models.DateField()
     phoneNumber = models.TextField()

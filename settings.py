@@ -26,7 +26,7 @@ SECRET_KEY = '#r!oj!mfty&2zp+c)7t(s)h)wpufcg3*w#(efj_=eyd44=-l52'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk']
+ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk','35.246.148.56']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Eventak',
     'psycopg2',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -124,9 +125,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
+STATIC_ROOT = '/var/www/html/Eventak/Evetak/static/'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
-    '/var/www/html/Eventak/Eventak/static/',
+    '/var/www/html/Eventak/static/',
 ]
 
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
