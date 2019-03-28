@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from Eventak.models import Users
 
-class UsersSerializer(models.Model):
+class UsersSerializer(serializers.Serializer):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=True, blank=True)
     username = models.CharField(max_length=24, unique=True, null=True, blank=True)
@@ -12,3 +12,8 @@ class UsersSerializer(models.Model):
 
     def create(self, validated_data):
         return Users.objects.create(**validated_data)
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'passwordHash', 'profilePic', 'birthDate', 'phoneNumber')

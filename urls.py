@@ -24,8 +24,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('login/', views.login, name='login'),
     path('signup/', views.Signup, name='Signup'),
-    path('loginm/', Phone.login, name='Phonelogin'),
-    path('phone/login', Phone.PhoneLogin, name="Phonelogin")
+    path('loginm/',Phone.login, name='Phonelogin'),
+    path('phone/login/', Phone.PhoneLogin, name="Phonelogin"),
     path('map/', views.map, name='map'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
 

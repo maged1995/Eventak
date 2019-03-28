@@ -7,24 +7,25 @@ For more information on this file, see
 https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 """
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
 from Eventak.models import Users
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
 def login(request):
-    username = request.POST.get('username')
+    username = request.GET.get('username')
     usres = Users.objects.all().filter(username=username)
     if(usres):
         us=usres[0]
         print(usres)
         res = ''
-        if us.verify_password(request.POST.get('password', None)):
+        if us.verify_password(request.GET.get('password', None)):
                 res={
                     'login':'success',
                     'UserInfo':{
                         'username':us.username,
-                        'email':us.email,
+                        'email':'',
                         'profilePic':us.profilePic,
                         #'birthDate':us.birthDate
                     }

@@ -104,6 +104,13 @@ def Signup(request):
         }
         return HttpResponse(template.render(context, request))
 
+def map(request):
+    template = loader.get_template("MapALT.html")
+    context = {
+    
+    }
+    return HttpResponse(template.render(context, request))
+
 def validate_username(request):
     username = request.GET.get('username', None)
     data = {
