@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak.models import Users
+from Eventak.models import Users, Events
 import random, string
 
 def index(request):
@@ -79,9 +79,9 @@ def login(request):
 
     elif request.method == 'GET':
         template = loader.get_template("Login.html")
-        '''u = Users(birthDate="1995-06-21",username = "maged95")
+        u = Users(birthDate="1995-06-21",username = "maged95")
         u.hash_password("Leila")
-        u.save()'''
+        u.save()
         res = Users.objects.all().filter(username="maged95")
         #print(res)
         context = {
@@ -107,7 +107,7 @@ def Signup(request):
 def map(request):
     template = loader.get_template("MapALT.html")
     context = {
-    
+
     }
     return HttpResponse(template.render(context, request))
 
@@ -120,3 +120,51 @@ def validate_username(request):
     if data['is_taken']:
         data['error_message'] = 'A user with this username already exists.'
     return JsonResponse(data)
+
+def CreateEvent(request): #EDIT NEEDED
+    if request.method == 'POST':
+        print(request.POST.get('EventName'))
+        u = Users.objects.get(id=1)
+        e = Events(name = request.POST.get('EventName'),
+                   description = request.POST.get('description'),
+                   location= request.POST.get('location'),
+                   city= request.POST.get('city'),
+                   locLong='30.044235', locLat='31.235540', booking='True', CreatorID=u,
+                   day='2019-06-21')
+        e.save()
+        print("pass")
+        return redirect("/")
+    elif request.method=='GET':
+        template = loader.get_template("EventCreate.html")
+        Events={
+
+        }
+        return HttpResponse(template.render(Events, request))
+
+def Find(request):
+    if request.method == 'GET':
+        Events = Events.objects.all().filter(city=request.GET.get('city'))
+        Event = Events[0]
+        #u = Users.objects.get(id=Event.CreatorID.id)
+        if(Event):
+            res = {
+                'Found':'True',
+                'Event':{
+                    'Name':Event.name,
+                    'description':Event.description,
+                    'location':Event.location,
+                    'city':Event.city,
+                    'Map':{
+                        'locLong':Event.locLong,
+                        'locLat':Event.locLat,
+                    },
+                    'booking': str(Event.booking),
+                    'CreatorID':Event.CreatorID.id,
+                    #'day':Event.day,
+                }
+            }
+        else:
+            res = {
+                'Found':'False',
+            }
+        return JsonResponse(res)

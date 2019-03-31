@@ -4,9 +4,9 @@ from passlib.apps import django_context as pwd_context
 
 class Users(models.Model):
     id = models.AutoField(primary_key=True)
-    email = models.EmailField(unique=True, null=True, blank=True)
-    username = models.CharField(max_length=24, unique=True, null=True, blank=True)
-    passwordHash = models.CharField(max_length=86, null=True, blank=True)
+    email = models.EmailField(unique=True, null=False, blank=False)
+    username = models.CharField(max_length=24, unique=True, null=False, blank=False)
+    passwordHash = models.CharField(max_length=86, null=False, blank=False)
     profilePic = models.TextField()
     birthDate = models.DateField()
     phoneNumber = models.TextField()
@@ -20,22 +20,34 @@ class Users(models.Model):
 class RelStat(models.Model):
     f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE)
     f2id = models.ForeignKey('Users', related_name= 'p2', on_delete=models.CASCADE)
-    stat = models.IntegerField(null=True, blank=True)
+    stat = models.IntegerField(null=False, blank=False)
 
 class Events(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=50, null=False, blank=False)
     description = models.TextField()
     location = models.TextField(max_length=50)
-    locLong = models.CharField(max_length=10, null=True, blank=True)
-    locLat = models.CharField(max_length=10, null=True, blank=True)
+    locLong = models.CharField(max_length=10, null=False, blank=False)
+    locLat = models.CharField(max_length=10, null=False, blank=False)
     booking = models.BooleanField()
     CreatorID = models.ForeignKey('Users', on_delete=models.CASCADE)
     day = models.DateField()
 
 class EventTypes(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=15, null=True, blank=True)
+    name = models.CharField(max_length=15, null=False, blank=False)
+    def findMainParent(self, id):
+        p = "b"
+        while p!='':
+            find = SubEventTypes.objects.all().filter(E2id=id)
+
+
+
+class SubEventTypes(models.Model):
+    E1id = models.ForeignKey('EventTypes', related_name= 'p', on_delete=models.CASCADE) #parent
+    E2id = models.ForeignKey('EventTypes', related_name= 'c', on_delete=models.CASCADE) #child
+
+
 
 class UserPref(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)
@@ -44,4 +56,4 @@ class UserPref(models.Model):
 class UserEvent(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)
     eid = models.ForeignKey('Events', on_delete=models.CASCADE)
-    stat = models.IntegerField(null=True, blank=True)
+    stat = models.IntegerField(null=False, blank=False)

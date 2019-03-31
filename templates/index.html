@@ -1,11 +1,11 @@
-{% extends "main.html" %}
+{% extends "mainAlt.html" %}
 {% block content %}
     <h1><B><I><u><p>Upcoming Events:</p></u></I></B></h1>
     <!-- Automatic Slideshow Images -->
 
     {% for Event in Events %}
     <div class="mySlides w3-display-container w3-center">
-      <img src="/static/{{Event.img}}" class="EventImg">
+      <div style="height:{{biggest_height}}px"><img src="/static/{{Event.img}}" class="EventImg" style="max-width:100%; height:auto;"></div>
       <div class="w3-display-bottommiddle w3-container w3-text-white w3-padding-32 w3-hide-small">
         <h3>{{Event.name}}</h3>
         <p><b>{{Event.loc}}</b></p>
@@ -21,7 +21,7 @@
     <div class="w3-row-padding">
 
     </div>
-    <div class="row divider">
+    <div class="row divider events">
     {% for Event in Events %}
     <div class="col-4 container w3-margin-bottom">
       <img src="/static/{{Event.img}}" alt="Cairo festival city" style="width:100%" class="w3-hover-opacity">

@@ -27,6 +27,8 @@ urlpatterns = [
     path('loginm/',Phone.login, name='Phonelogin'),
     path('phone/login/', Phone.PhoneLogin, name="Phonelogin"),
     path('map/', views.map, name='map'),
+    path('EventCreate/', views.CreateEvent, name='eventCreate'),
+    path('EventGet/', views.Find, name= 'eventGet'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
 
 ]
