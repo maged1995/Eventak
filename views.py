@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak.models import Users, Events
+from Eventak.models import Users, events
 import random, string
 
 def index(request):
@@ -39,6 +39,7 @@ def index(request):
                        Omar khairat's next opera concert at 29 of
                        september 2019."""}],
                 "login": request.session["login"],
+		'biggest_height': '700',
 
     }
     return HttpResponse(template.render(Events, request))
@@ -79,9 +80,9 @@ def login(request):
 
     elif request.method == 'GET':
         template = loader.get_template("Login.html")
-        u = Users(birthDate="1995-06-21",username = "maged95")
+        """u = Users(birthDate="1995-06-21",username = "maged95", email = "magedsaadaziz@gmail.com")
         u.hash_password("Leila")
-        u.save()
+        u.save()"""
         res = Users.objects.all().filter(username="maged95")
         #print(res)
         context = {
@@ -125,7 +126,7 @@ def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
         print(request.POST.get('EventName'))
         u = Users.objects.get(id=1)
-        e = Events(name = request.POST.get('EventName'),
+        e = events(name = request.POST.get('EventName'),
                    description = request.POST.get('description'),
                    location= request.POST.get('location'),
                    city= request.POST.get('city'),
@@ -143,25 +144,25 @@ def CreateEvent(request): #EDIT NEEDED
 
 def Find(request):
     if request.method == 'GET':
-        Events = Events.objects.all().filter(city=request.GET.get('city'))
-        Event = Events[0]
-        #u = Users.objects.get(id=Event.CreatorID.id)
-        if(Event):
+        Events = events.objects.all().filter(city=request.GET.get('city'))
+        if(Events):
+            E = [{} for _ in range(len(Events))]
+            for i in range(0,len(Events)):
+                E[i]['Name']=Events[i].name
+                E[i]['description']=Events[i].description
+                E[i]['location']=Events[i].location
+                E[i]['city']=Events[i].city
+                E[i]['Map']={
+                    'locLong':Events[i].locLong,
+                    'locLat':Events[i].locLat
+                }
+                E[i]['booking']= str(Events[i].booking)
+                E[i]['CreatorID']=Events[i].CreatorID.id
             res = {
                 'Found':'True',
-                'Event':{
-                    'Name':Event.name,
-                    'description':Event.description,
-                    'location':Event.location,
-                    'city':Event.city,
-                    'Map':{
-                        'locLong':Event.locLong,
-                        'locLat':Event.locLat,
-                    },
-                    'booking': str(Event.booking),
-                    'CreatorID':Event.CreatorID.id,
+                'Event':E
                     #'day':Event.day,
-                }
+
             }
         else:
             res = {

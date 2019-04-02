@@ -22,13 +22,14 @@ class RelStat(models.Model):
     f2id = models.ForeignKey('Users', related_name= 'p2', on_delete=models.CASCADE)
     stat = models.IntegerField(null=False, blank=False)
 
-class Events(models.Model):
+class events(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, null=False, blank=False)
     description = models.TextField()
     location = models.TextField(max_length=50)
     locLong = models.CharField(max_length=10, null=False, blank=False)
     locLat = models.CharField(max_length=10, null=False, blank=False)
+    city = models.CharField(max_length=20, null=False, blank=False)
     booking = models.BooleanField()
     CreatorID = models.ForeignKey('Users', on_delete=models.CASCADE)
     day = models.DateField()
