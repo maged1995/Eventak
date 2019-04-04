@@ -21,7 +21,8 @@ from rest_framework import routers
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
+    path('', views.map, name='map'),
+    path('index/', views.index, name='index')
     path('login/', views.login, name='login'),
     path('signup/', views.Signup, name='Signup'),
     path('loginm/',Phone.login, name='Phonelogin'),
@@ -30,5 +31,4 @@ urlpatterns = [
     path('EventCreate/', views.CreateEvent, name='eventCreate'),
     path('EventGet/', views.Find, name= 'eventGet'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
-
 ]

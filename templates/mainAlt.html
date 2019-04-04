@@ -4,13 +4,13 @@
     {% include "head.html" %}
   </head>
 	<body>
-    <div id="map" style="position:fixed"></div>
+    <div id="map"></div>
     {% include "header.html" %}
     <div class="row divider" id="main">
       <div class="col-md-2 bg-light" onclick="OpenCloseMap()" style="opacity: 0.0"></div>
-      <div class="col-md-8 bg-secondary main" height="100%" >
+      <div class="col-md-8 bg-secondary" height="100%">
         <div class="col-md-1"></div>
-        <div class="col-md-12 bg-secondary">
+        <div class="col-md-12 bg-secondary" id="loadbasic">
         {% block content %}
 			  {% endblock %}
         </div>
@@ -107,6 +107,8 @@
         ]
       });
     }
+
+
     $(window).bind("load", function() {
       document.getElementById("map").style.position = 'fixed';
     });
@@ -119,6 +121,58 @@
         $("#main").css("display","none");
       }
     }
+
+    var curPage = "/index/";
+    $("#loadbasic").load("/index/");
+
+    $(document).ready(function(){
+      var myIndex = 0;
+      carousel();
+
+      function carousel() {
+          var i;
+          var x = document.getElementsByClassName("mySlides");
+          for (i = 0; i < x.length; i++) {
+             x[i].style.display = "none";
+          }
+          myIndex++;
+          if (myIndex > x.length) {myIndex = 1}
+          x[myIndex-1].style.display = "block";
+          setTimeout(carousel, 2000);
+      }
+
+      // Used to toggle the menu on small screens when clicking on the menu button
+      function myFunction() {
+          var x = document.getElementById("navDemo");
+          if (x.className.indexOf("w3-show") == -1) {
+              x.className += " w3-show";
+          } else {
+              x.className = x.className.replace(" w3-show", "");
+          }
+      }
+
+      // When the user clicks anywhere outside of the modal, close it
+      var modal = document.getElementById('ticketModal');
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+
+      $("#index").click(function(){
+        if (curPage != "/index/"){
+          curPage = "/index/";
+          $("#loadbasic").load("/index/");
+        }
+      });
+      $("#login").click(function(){
+        if (curPage != "/login/"){
+          curPage = "/login/";
+          $("#loadbasic").load("/login/");
+        }
+      });
+    });
+
   </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5BEaYPvpke0l_9Fc8ddAe2OmxQmxAp8g&callback=initMap"
   async defer></script>
