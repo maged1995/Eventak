@@ -106,7 +106,7 @@ def Signup(request):
         return HttpResponse(template.render(context, request))
 
 def map(request):
-    template = loader.get_template("MapALT.html")
+    template = loader.get_template("mainAlt.html")
     context = {
 
     }

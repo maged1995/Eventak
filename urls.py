@@ -22,7 +22,7 @@ from rest_framework import routers
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.map, name='map'),
-    path('index/', views.index, name='index')
+    path('index/', views.index, name='index'),
     path('login/', views.login, name='login'),
     path('signup/', views.Signup, name='Signup'),
     path('loginm/',Phone.login, name='Phonelogin'),
