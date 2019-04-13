@@ -3,7 +3,6 @@
   <head>
     {% include "head.html" %}
   </head>
-	<body>
     <div id="map"></div>
     {% include "header.html" %}
     <div class="row divider" id="main">
@@ -11,8 +10,7 @@
       <div class="col-md-8 bg-secondary main" height="100%">
         <div class="col-md-1"></div>
         <div class="col-md-12 bg-secondary" id="loadbasic">
-        {% block content %}
-			  {% endblock %}
+
         </div>
         <div class="col-md-1"></div>
       </div>
@@ -106,7 +104,122 @@
           }
         ]
       });
-      infoWindow = new google.maps.InfoWindow;
+      if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');
+            infoWindow.open(map);
+            map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+    }
+
+
+    $(window).bind("load", function() {
+      document.getElementById("map").style.position = 'fixed';
+    });
+
+    function OpenCloseMap(){
+      if($("#main").css("display")=="none"){
+        $("#main").css("display","flex");
+      }
+      else{
+        $("#main").css("display","none");
+      }
+    }
+
+    var curPage = "/index/";
+    $("#loadbasic").load("/index/");
+
+    $(document).ready(function(){
+      var myIndex = 0;
+      var curPage = "/index/";
+      $("#loadbasic").load("/index/");
+      carousel();
+      function carousel() {
+          if(curPage=="/index/"){
+          var i;
+          var x = document.getElementsByClassName("mySlides");
+          for (i = 0; i < x.length; i++) {
+             x[i].style.display = "none";
+          }
+          myIndex++;
+          if (myIndex >= x.length) {myIndex = 0}
+          if(x.length>0) x[myIndex].style.display = "block";
+	}
+	setTimeout(carousel, 2000);
+      }
+
+      // Used to toggle the menu on small screens when clicking on the menu button
+      function myFunction() {
+          var x = document.getElementById("navDemo");
+          if (x.className.indexOf("w3-show") == -1) {
+              x.className += " w3-show";
+          } else {
+              x.className = x.className.replace(" w3-show", "");
+          }
+      }
+
+      // When the user clicks anywhere outside of the modal, close it
+      var modal = document.getElementById('ticketModal');
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+
+      $("#index").click(function(){
+        if (curPage != "/index/"){
+          curPage = "/index/";
+          $("#loadbasic").load("/index/");
+        }
+      });
+      $("#login").click(function(){
+        if (curPage != "/login/"){
+          if ($('#loginBut').text() != "Logout"){
+            curPage = "/login/";
+          }
+        }
+        $("#loadbasic").load("/login/");
+      });
+      $("#myEv").click(function(){
+        if (curPage != "/myEvents/"){
+          curPage = "/myEvents/";
+          $.ajax({
+              url: '/myEvents/'/*+ $(this).parent().attr('id')*/,
+              type: 'GET',
+              success: function(result) {
+                $("#loadbasic").html(result)
+                alert("pass");
+                $(".deleteEv").click(function(){
+                  var elem = $(this).parent().parent().attr('id')
+                  $("#"+elem).remove();
+                  $.ajax({
+                      url: '/deleteEv/' + elem + '/',
+                      type: 'DELETE',
+                      success: function(result) {
+                          $("#"+elem).remove();
+                      }
+                  });
+                });
+              }
+          });
+        }
+      });
+    });
+
+    /*
+    infoWindow = new google.maps.InfoWindow;
       if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             var pos = {
@@ -185,7 +298,7 @@
           modal.style.display = "none";
         }
       }
-       
+
       $("#index").click(function(){
         if (curPage != "/index/"){
           curPage = "/index/";
@@ -199,6 +312,7 @@
         }
       });
     });
+    */
 
   </script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5BEaYPvpke0l_9Fc8ddAe2OmxQmxAp8g&callback=initMap"

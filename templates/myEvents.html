@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% block content %}
+<div>
+  {% for event in Events %}
+
+  <div id="Ev{{event.id}}">
+    {{event.Name}}
+    {{event.description}}
+    {{event.location}}
+    <div class="updateSection">
+      <button type="button" class="editEv" name="edit">Edit</button>
+      <button type="button" class="deleteEv" name="delete">Delete</button>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+<br/>
+
+{% endblock %}

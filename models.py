@@ -30,9 +30,18 @@ class events(models.Model):
     locLong = models.CharField(max_length=10, null=False, blank=False)
     locLat = models.CharField(max_length=10, null=False, blank=False)
     city = models.CharField(max_length=20, null=False, blank=False)
-    booking = models.BooleanField()
-    CreatorID = models.ForeignKey('Users', on_delete=models.CASCADE)
-    day = models.DateField()
+    booking = models.BooleanField(null=False)
+    Creator = models.ForeignKey('Users', on_delete=models.CASCADE)
+    timeFrom = models.DateTimeField()
+    timeTo = models.DateTimeField()
+    ifPlaceNum = models.BooleanField(null=False)
+    placeNum = models.IntegerField(null=True, blank=True)
+
+class reservations(models.Model):
+    event = models.ForeignKey('events', on_delete=models.CASCADE)
+    user = models.ForeignKey('Users', on_delete=models.CASCADE)
+    quantity =  models.IntegerField(null=False, blank=False)
+    status = models.IntegerField(null=False, blank=False)
 
 class EventTypes(models.Model):
     id = models.AutoField(primary_key=True)
@@ -47,8 +56,6 @@ class EventTypes(models.Model):
 class SubEventTypes(models.Model):
     E1id = models.ForeignKey('EventTypes', related_name= 'p', on_delete=models.CASCADE) #parent
     E2id = models.ForeignKey('EventTypes', related_name= 'c', on_delete=models.CASCADE) #child
-
-
 
 class UserPref(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)

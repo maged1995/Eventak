@@ -7,9 +7,9 @@
 {% block content %}
 <h1 class="title">Sign Up</h1>
 <form method="post" action="/signup/" data-validate-username-url="/ajax/validate_username/" data-validate-daysNum-url="/ajax/get_Days_Num/">{% csrf_token %}
-  <label>{{request.session.Reg_failure.username}}</label><br/>
-  <label for="username">Email or Username: </label>{{ form.as_p }}<input type="text" placeholder="Email or Password..." name="username" id="id_username" class="js-validate-username"/><br/>
-  <label for="password">Password: </label><input type="password" placeholder="Username.." name="password"/><br/>
+  <label for="username">Username: </label>{{ form.as_p }}<input type="text" placeholder="Username..." name="username" id="id_username" class="js-validate-username"/><br/>
+  <label for="Email">Email: </label><input type="text" placeholder="Email..." name="email"/><br/>
+  <label for="password">Password: </label><input type="password" placeholder="Password.." name="password"/><br/>
   <label for="Month">Birth Date:
     <select name='Month' id="Month" class="js-validate-Month">
       <option value=''>Select Month</option>
