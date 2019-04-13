@@ -80,9 +80,9 @@ def login(request):
 
     elif request.method == 'GET':
         template = loader.get_template("Login.html")
-        """u = Users(birthDate="1995-06-21",username = "maged95", email = "magedsaadaziz@gmail.com")
-        u.hash_password("Leila")
-        u.save()"""
+        #u = Users(birthDate="1995-06-21",username = "maged95", email = "magedsaadaziz@gmail.com")
+        #u.hash_password("Leila")
+        #u.save()
         res = Users.objects.all().filter(username="maged95")
         #print(res)
         context = {
