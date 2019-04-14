@@ -18,8 +18,9 @@
 		</div>
 	</body>
   <script>
-    var map;
+    var map, infoWindow;
     function initMap() {
+      infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 30.057193, lng: 31.348490},
         zoom: 13,
@@ -188,9 +189,16 @@
         if (curPage != "/login/"){
           if ($('#loginBut').text() != "Logout"){
             curPage = "/login/";
+            $("#loadbasic").load("/login/");
+          }
+          else{
+            $("#loadbasic").load("/login/");
+            setTimeout(function(){
+               window.location.reload(1);
+            }, 500);
           }
         }
-        $("#loadbasic").load("/login/");
+
       });
       $("#myEv").click(function(){
         if (curPage != "/myEvents/"){
@@ -202,11 +210,13 @@
                 $("#loadbasic").html(result)
                 alert("pass");
                 $(".deleteEv").click(function(){
-                  var elem = $(this).parent().parent().attr('id')
+                  var elem = $(this).parent().parent().attr('id');
+                  alert(elem);
                   $("#"+elem).remove();
                   $.ajax({
                       url: '/deleteEv/' + elem + '/',
                       type: 'DELETE',
+                      headers: {'X-CSRFToken':'{{ csrf_token }}'},
                       success: function(result) {
                           $("#"+elem).remove();
                       }

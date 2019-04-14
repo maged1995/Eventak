@@ -1,15 +1,7 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
-from django.template import loader
-from Eventak2.models import events, Users, reservations
-import random, string
-
-
-
 def index(request):
     template = loader.get_template('index.html')
-    if not 'user' in request.session:
-        request.session['user']=''
+    if not 'UserInfo' in request.session:
+        request.session['UserInfo']=''
     if not 'state' in request.session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
         request.session['state']=state
@@ -39,11 +31,11 @@ def index(request):
                       "img":"angham.jpg", 'desc':"""Buy tickets for
                        Omar khairat's next opera concert at 29 of
                        september 2019."""}],
-                "login": request.session["user"],
+                'UserInfo': request.session['UserInfo'],
                 'biggest_height': '700',
 
     }
-    print(request.session['user'])
+    print(request.session.get('UserInfo'))
     return HttpResponse(template.render(Events, request))
 
 def login(request):
@@ -67,8 +59,8 @@ def login(request):
                         #'birthDate':us.birthDate
                     }
                 }
-                request.session['user'] = res
-                print(request.session['user'])
+                request.session['UserInfo'] = res
+                print(request.session['UserInfo'])
                 return redirect('/', res)
             else:
                 res = {
@@ -83,11 +75,8 @@ def login(request):
             return redirect("/login/")
 
     elif request.method == 'GET':
-        if(request.session["user"]!=''):
-            res={}
-            print("pass")
-            request.session["user"]=''
-            return redirect('/index/', res)
+        if(request.session['UserInfo']!=''):
+            request.session['UserInfo'] = ''
         template = loader.get_template("Login.html")
         '''u = Users(birthDate="1995-06-21",username = "maged95")
         u.hash_password("Leila")
@@ -205,7 +194,7 @@ def Find(request):
 def map(request):
     template = loader.get_template('mainAlt.html')
     if not 'login' in request.session:
-        request.session['user']=''
+        request.session['User']=''
     if not 'state' in request.session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
         request.session['state']=state
@@ -215,7 +204,7 @@ def map(request):
     return HttpResponse(template.render(context, request))
 
 def displayMyEvents(request):
-    us = Users.objects.get(id=1)  #request.session['user']["UserInfo"]["username"])
+    us = Users.objects.get(id=1)  #request.session['User']["UserInfo"]["username"])
     Events = events.objects.all().filter(Creator=us)
     if(Events):
         print("pass")
@@ -248,7 +237,7 @@ def displayMyEvents(request):
     return HttpResponse(template.render(res, request))
 
 def displayReservations(request):
-    us = Users.objects.get(id=1)   #request.session['user']["UserInfo"]["username"])
+    us = Users.objects.get(id=1)   #request.session['User']["UserInfo"]["username"])
     Reservations = reservations.objects.all().filter(user=us)
     if (reservations):
         E = [{} for _ in range(len(Reservations))]
@@ -277,3 +266,8 @@ def displayReservations(request):
         }
     template = loader.get_template('myReservations.html')
     return HttpResponse(template.render(res, request))
+
+def deleteEv(request, event):
+    if request.method == 'DELETE':
+        print(event)
+        return redirect("/")
