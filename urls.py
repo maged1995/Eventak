@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from . import views, Phone
+from . import views, Phone, insertItems  #remove InsertItems on full deployment
 from rest_framework import routers
 
 urlpatterns = [

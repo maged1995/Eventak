@@ -10,6 +10,7 @@ class Users(models.Model):
     profilePic = models.TextField()
     birthDate = models.DateField()
     phoneNumber = models.TextField()
+    typePrefs = models.ManyToManyField(EventTypes)
 
     def hash_password(self, password):
         self.passwordHash = pwd_context.encrypt(password)
@@ -36,30 +37,25 @@ class events(models.Model):
     timeTo = models.DateTimeField()
     ifPlaceNum = models.BooleanField(null=False)
     placeNum = models.IntegerField(null=True, blank=True)
+    EventTypes = models.ManyToManyField(EventTypes)
 
 class reservations(models.Model):
-    event = models.ForeignKey('events', on_delete=models.CASCADE)
-    user = models.ForeignKey('Users', on_delete=models.CASCADE)
+    event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
+    user = models.ForeignKey('Users', on_delete=models.CASCADE, null=False, blank=False)
     quantity =  models.IntegerField(null=False, blank=False)
     status = models.IntegerField(null=False, blank=False)
 
 class EventTypes(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=15, null=False, blank=False)
+    name = models.CharField(max_length=15, null=False, blank=False, unique=True)
     def findMainParent(self, id):
         p = "b"
         while p!='':
             find = SubEventTypes.objects.all().filter(E2id=id)
 
-
-
 class SubEventTypes(models.Model):
     E1id = models.ForeignKey('EventTypes', related_name= 'p', on_delete=models.CASCADE) #parent
     E2id = models.ForeignKey('EventTypes', related_name= 'c', on_delete=models.CASCADE) #child
 
-class UserPref(models.Model):
-    uid = models.ForeignKey('Users', on_delete=models.CASCADE)
-    etid = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
 
 class UserEvent(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)

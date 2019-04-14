@@ -149,6 +149,9 @@ def getDaysNum(a):
 
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
+        #type= EventTypes(name="Cinema")
+        #type.save()
+        t = EventTypes.objects.all().filter(name="Cinema")
         print(request.POST.get('EventName'))
         u = Users.objects.get(id=1)
         e = events(name = request.POST.get('EventName'),
@@ -158,6 +161,7 @@ def CreateEvent(request): #EDIT NEEDED
                    locLong='30.044235', locLat='31.235540', booking='True', Creator=u,
                    timeFrom='2019-06-21 08:30', timeTo='2019-06-21 21:30', ifPlaceNum=True, placeNum=60)
         e.save()
+        #e.EventTypes.set(t)
         print("pass")
         return redirect("/")
     elif request.method=='GET':
@@ -185,8 +189,8 @@ def Find(request):
         if (types):
             print("Pass")
             Events = events.objects.all().filter(EventTypes = types[0])
-        else:
-            Events = events.objects.all()
+    else:
+        Events = events.objects.all()
         #u = Users.objects.get(id=Event.CreatorID.id)
     if(Events):
         E = [{} for _ in range(len(Events))]
