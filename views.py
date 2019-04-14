@@ -163,7 +163,22 @@ def CreateEvent(request): #EDIT NEEDED
 
 def Find(request):
     if request.method == 'GET':
-        Events = events.objects.all().filter(city=request.GET.get('city'))
+        if request.GET.get('city'):
+            if request.GET.get('eventType'):
+                print("PASS")
+                types = EventTypes.objects.all().filter(name=request.GET.get('eventType'))
+                if (types):
+                    Events = events.objects.all().filter(city=request.GET.get('city'), EventTypes = types[0])
+                else:
+                    Events = events.objects.all().filter(city=request.GET.get('city'))
+            else:
+                Events = events.objects.all().filter(city=request.GET.get('city'))
+        elif request.GET.get('eventType'):
+            print("pass")
+            types = EventTypes.objects.all().filter(name=request.GET.get('eventType'))
+            if (types):
+                print("Pass")
+                Events = events.objects.all().filter(EventTypes = types[0])
         #u = Users.objects.get(id=Event.CreatorID.id)
         if(Events):
             E = [{} for _ in range(len(Events))]
@@ -177,7 +192,7 @@ def Find(request):
                     'locLat':Events[i].locLat
                 }
                 E[i]['booking']= str(Events[i].booking)
-                E[i]['CreatorID']=Events[i].CreatorID.id
+                E[i]['CreatorID']=Events[i].Creator.id
 
             res = {
                 'Found':'True',
