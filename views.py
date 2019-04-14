@@ -168,7 +168,7 @@ def CreateEvent(request): #EDIT NEEDED
         return HttpResponse(template.render(Events, request))
 
 def Find(request):
-    if request.method == 'GET':
+    Events = {}
         if request.GET.get('city'):
             if request.GET.get('eventType'):
                 print("PASS")
@@ -185,6 +185,8 @@ def Find(request):
             if (types):
                 print("Pass")
                 Events = events.objects.all().filter(EventTypes = types[0])
+            else:
+                Events = events.objects.all()
         #u = Users.objects.get(id=Event.CreatorID.id)
         if(Events):
             E = [{} for _ in range(len(Events))]
