@@ -1,3 +1,9 @@
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
+from django.template import loader
+from Eventak.models import events, Users, reservations, EventTypes
+import random, string
+
 def index(request):
     template = loader.get_template('index.html')
     if not 'UserInfo' in request.session:
