@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
-from Eventak2.models import events, Users, reservations, EventTypes
+from Eventak.models import events, Users, reservations, EventTypes
 from django.shortcuts import redirect
 
 def init(request):

@@ -10,7 +10,7 @@ class Users(models.Model):
     profilePic = models.TextField()
     birthDate = models.DateField()
     phoneNumber = models.TextField()
-    typePrefs = models.ManyToManyField(EventTypes)
+    typePrefs = models.ManyToManyField('EventTypes')
 
     def hash_password(self, password):
         self.passwordHash = pwd_context.encrypt(password)
@@ -37,7 +37,7 @@ class events(models.Model):
     timeTo = models.DateTimeField()
     ifPlaceNum = models.BooleanField(null=False)
     placeNum = models.IntegerField(null=True, blank=True)
-    EventTypes = models.ManyToManyField(EventTypes)
+    EventTypes = models.ManyToManyField('EventTypes')
 
 class reservations(models.Model):
     event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
