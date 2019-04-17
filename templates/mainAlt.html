@@ -24,6 +24,12 @@
       map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 30.057193, lng: 31.348490},
         zoom: 13,
+        streetViewControl:false,
+        fullscreenControl: false,
+        mapTypeControlOptions: {
+          position: google.maps.ControlPosition.LEFT_CENTER,
+          style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+        },
         styles: [
           {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
           {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
@@ -123,6 +129,14 @@
           // Browser doesn't support Geolocation
           handleLocationError(false, infoWindow, map.getCenter());
         }
+        function toggleStreetView() {
+          var toggle = panorama.getVisible();
+          if (toggle == false) {
+            panorama.setVisible(true);
+          } else {
+            panorama.setVisible(false);
+          }
+        }
     }
 
 
@@ -138,6 +152,20 @@
         $("#main").css("display","none");
       }
     }
+
+    $(".nav-link").click(function(){
+      if($("#main").css("display")=="none"){
+        $("#main").css("display","flex");
+      }
+    });
+
+    $(".btn").click(function(){
+      if($(this).parent().parent().parent().hasClass('navbar')){
+        if($("#main").css("display")=="none"){
+          $("#main").css("display","flex");
+        }
+      }
+    });
 
     var curPage = "/index/";
     $("#loadbasic").load("/index/");
@@ -157,8 +185,8 @@
           myIndex++;
           if (myIndex >= x.length) {myIndex = 0}
           if(x.length>0) x[myIndex].style.display = "block";
-	}
-	setTimeout(carousel, 2000);
+  }
+  setTimeout(carousel, 2000);
       }
 
       // Used to toggle the menu on small screens when clicking on the menu button
@@ -185,6 +213,21 @@
           $("#loadbasic").load("/index/");
         }
       });
+
+      $("#Register").click(function(){
+        if (curPage != "/signup/"){
+          curPage = "/signup/";
+          $("#loadbasic").load("/signup/");
+        }
+      });
+
+      $("#evCreate").click(function(){
+        if (curPage != "/EventCreate/"){
+          curPage = "/EventCreate/";
+          $("#loadbasic").load(curPage);
+        }
+      });
+
       $("#login").click(function(){
         if (curPage != "/login/"){
           if ($('#loginBut').text() != "Logout"){
@@ -199,6 +242,32 @@
           }
         }
 
+      });
+      $("#myRes").click(function(){
+        if (curPage != "/myReservations/"){
+          curPage = "/myReservations/";
+          $.ajax({
+              url: '/myReservations/'/*+ $(this).parent().attr('id')*/,
+              type: 'GET',
+              success: function(result) {
+                $("#loadbasic").html(result)
+                alert("pass");
+                $(".deleteRes").click(function(){
+                  var elem = $(this).parent().parent().attr('id');
+                  alert(elem);
+                  $("#"+elem).remove();
+                  $.ajax({
+                      url: '/deleteRes/' + elem + '/',
+                      type: 'DELETE',
+                      headers: {'X-CSRFToken':'{{ csrf_token }}'},
+                      success: function(result) {
+                          $("#"+elem).remove();
+                      }
+                  });
+                });
+              }
+          });
+        }
       });
       $("#myEv").click(function(){
         if (curPage != "/myEvents/"){

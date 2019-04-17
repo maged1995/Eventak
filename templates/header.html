@@ -2,12 +2,25 @@
 <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark navig" style="z-index:1">
 	<div class="navbar-nav justify-content-left col-md-1 col-sm-1 col-2"> <button type="button" onclick="OpenCloseMap()"  class="btn btn-default btn-lg"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></button> </div>
 	<div class="navbar-nav justify-content-left col-md-3 col-sm-2 col-2">
-		<li class="nav-item active">
-			<a class="nav-link title" id="index" ><strong>Eventak</strong></a>
+		<li class="nav-item active" >
+			<a class="nav-link title" id="index" ><label><strong>Eventak</strong></label></a>
 		</li>
 	</div>
-	<div class="navbar-nav justify-content-left col-md-6 col-sm-2 col-2"></div>
-	<div class="navbar-nav col-md-1  justify-content-left col-sm-3 col-3"><a id="login"><button id="loginBut" class="btn btn-success">{% if request.session.UserInfo == "" %}Login{% else %}Logout{% endif %}</button></a>
+	<div class="navbar-nav justify-content-left col-md-6 col-sm-2 col-2">
+		<li class="nav-item">
+			{% if request.session.UserInfo != "" %}<a class="nav-link title" id="myEv" ><label><strong>My Events</strong></label></a>{% endif %}
+		</li>
+		<li class="nav-item">
+			{% if request.session.UserInfo != "" %}<a class="nav-link title" id="myRes" ><label><strong>My Reservations</strong></label></a>{% endif %}
+		</li>
+		<li class="nav-item">
+			{% if request.session.UserInfo != "" %}<a class="nav-link title" id="evCreate" ><label><strong>Create</strong></label></a>{% endif %}
+		</li>
 	</div>
-	<div class="col-md-1 "></div>
+	<div class="navbar-nav col-md-1  justify-content-left col-sm-3 col-3">
+		<a id="login"><button id="loginBut" class="btn btn-success">{% if request.session.UserInfo == "" %}Login{% else %}Logout{% endif %}</button></a>
+	</div>
+	<div class="col-md-1 ">
+		{% if request.session.UserInfo == "" %}<a id="Register"><button class="btn btn-success">Register</button></a>{% endif %}
+	</div>
 </div>
