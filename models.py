@@ -19,8 +19,8 @@ class Users(models.Model):
         return pwd_context.verify(password, self.passwordHash)
 
 class RelStat(models.Model):
-    f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE)
-    f2id = models.ForeignKey('Users', related_name= 'p2', on_delete=models.CASCADE)
+    f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE, null=False, blank=False)
+    f2id = models.ForeignKey('Users', related_name= 'p2', on_delete=models.CASCADE, null=False, blank=False)
     stat = models.IntegerField(null=False, blank=False)
 
 class events(models.Model):

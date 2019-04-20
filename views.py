@@ -269,18 +269,18 @@ def displayReservations(request):
     if (reservations):
         E = [{} for _ in range(len(Reservations))]
         for i in range(0,len(Reservations)):
-            Events = events.objects.all().filter(event=Reservations[i].event)
-            E[i]['Name']=Events[i].name
-            E[i]['description']=Events[i].description
-            E[i]['location']=Events[i].location
-            E[i]['city']=Events[i].city
-            E[i]['id']=Events[i].id
+            Event = Reservations[i].event
+            E[i]['Name']=Event.name
+            E[i]['description']=Event.description
+            E[i]['location']=Event.location
+            E[i]['city']=Event.city
+            E[i]['id']=Event.id
             E[i]['Map']={
-                'locLong':Events[i].locLong,
-                'locLat':Events[i].locLat
+                'locLong':Event.locLong,
+                'locLat':Event.locLat
             }
-            E[i]['booking']= str(Events[i].booking)
-            E[i]['CreatorID']=Events[i].CreatorID.id
+            E[i]['booking']= str(Event.booking)
+            E[i]['CreatorID']=Event.Creator.id
         res = {
             'Found':'True',
             'Events':E
@@ -294,7 +294,54 @@ def displayReservations(request):
     template = loader.get_template('myReservations.html')
     return HttpResponse(template.render(res, request))
 
-def deleteEv(request, event):
+def CancelEv(request, event):
     if request.method == 'DELETE':
+        e = events.objects.get(id=event)
+        e.delete()
         print(event)
-        return redirect("/")
+        return JsonResponse({'request':'success'})
+
+def CancelRes(request, event):
+    if request.method == 'DELETE':
+        e = events.objects.get(id=event)
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        res = UserEvent.objects.get(event=e, user=u)
+        res.stat = 0
+        res.save()
+        print(event)
+        return JsonResponse({'request':'success'})
+
+def findUser(request):
+    if request.method == 'GET':
+        users = Users.objects.all().filter(displayName = request.GET.get('nameR'))
+        CurUser = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        relation = RelStat.objects.all().filter(f1id=CurUser)
+        print(relation)
+        #relation = RelStat.object.all().filter(f1id=ru, f2id=u)
+        res = {'Found':'True',}
+        if(users):
+            for i in range(0,len(users)):
+                if users[i].stat!=-1:
+                    res['Users'][i]['id'] = users[i].id
+                    res['Users'][i]['email'] = users[i].email
+                    res['Users'][i]['username'] = users[i].username
+                    res['Users'][i]['profilePic'] = users[i].profilePic
+        template = loader.get_template('userSearch.html')
+        return HttpResponse(template.render(res, request))
+
+def requestFriendship(request):
+    if request.method == 'POST':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ru = Users.objects.all().filter(username = request.POST.get('usernameR'))
+        relation = RelStat.object.all().filter(f1id=ru, f2id=u)
+        if(relation):
+            if relation[0].stat==-1 or r==relation[0].stat==3:
+                return redirect("/")
+            else:
+                newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+                newRel.save()
+                return JsonResponse({'request':'success'})
+        else:
+            newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+            newRel.save()
+            return JsonResponse({'request':'success'})

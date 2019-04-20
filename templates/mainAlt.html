@@ -18,7 +18,7 @@
 		</div>
 	</body>
   <script>
-    var map, infoWindow;
+    var map, infoWindow, markerInd;
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
@@ -111,6 +111,20 @@
           }
         ]
       });
+      map.addListener('click', function(e) {
+        marker = placeMarkerAndPanTo(e.latLng, map);
+        markerInd++;
+        var infowindow = new google.maps.InfoWindow({
+          content: '<button type="button" class="btn btn-info" onclick="createEv('+markerInd+')">Create Event</button>',
+          marker:marker,
+        });
+
+        infowindow.open(map, marker);
+        google.maps.event.addListener(infowindow,'closeclick',function(){
+           infowindow.marker.setMap(null);
+        });
+      });
+
       if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
             var pos = {
@@ -139,6 +153,15 @@
         }
     }
 
+    function placeMarkerAndPanTo(latLng, map) {
+      var marker = new google.maps.Marker({
+        position: latLng,
+        map: map
+      });
+
+      map.panTo(latLng);
+      return marker;
+    }
 
     $(window).bind("load", function() {
       document.getElementById("map").style.position = 'fixed';
