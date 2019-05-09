@@ -24,6 +24,7 @@
       map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 30.057193, lng: 31.348490},
         zoom: 13,
+	disableDoubleClickZoom: true,
         streetViewControl:false,
         fullscreenControl: false,
         mapTypeControlOptions: {
@@ -111,7 +112,7 @@
           }
         ]
       });
-      map.addListener('click', function(e) {
+      map.addListener('dblclick', function(e) {
         marker = placeMarkerAndPanTo(e.latLng, map);
         markerInd++;
         var infowindow = new google.maps.InfoWindow({
@@ -119,7 +120,9 @@
           marker:marker,
         });
 
-        infowindow.open(map, marker);
+        setTimeout(function(){
+		infowindow.open(map, marker)
+	},550);
         google.maps.event.addListener(infowindow,'closeclick',function(){
            infowindow.marker.setMap(null);
         });
@@ -156,7 +159,8 @@
     function placeMarkerAndPanTo(latLng, map) {
       var marker = new google.maps.Marker({
         position: latLng,
-        map: map
+        map: map,
+	animation: google.maps.Animation.DROP,
       });
 
       map.panTo(latLng);
