@@ -33,4 +33,13 @@ urlpatterns = [
     path('EventCreate/', views.CreateEvent, name='eventCreate'),
     path('EventGet/', views.Find, name= 'eventGet'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
+    path('PhoneEventGet/', Phone.Find, name= 'PhoneEventGet'),
+    path('requestFriendship/', views.Find, name= 'Request Friendship'),
+    path('userSearch/', views.findUser, name= 'Search User'),
+    path('cancelEv/Ev<int:event>/', views.CancelEv, name= 'Delete Events'),
+    path('cancelRes/Ev<int:event>/', views.CancelRes, name= 'Delete Reservations'),
+    path('', views.map, name='map'),
+    path('ajax/validate_username/', views.validate_username, name='validate_username'),
+    path('ajax/get_Days_Num/', views.GetDaysNum, name='validate_username'),
+    path('initDb/', insertItems.init, name='initiate Database'),
 ]

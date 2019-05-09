@@ -158,18 +158,25 @@ def CreateEvent(request): #EDIT NEEDED
                    description = request.POST.get('description'),
                    location= request.POST.get('location'),
                    city= request.POST.get('city'),
-                   locLong='30.044235', locLat='31.235540', booking='True', Creator=u,
-                   timeFrom='2019-06-21 08:30', timeTo='2019-06-21 21:30', ifPlaceNum=True, placeNum=60)
+                   locLong=request.session['requestedLocation']['lng'],
+                   locLat=request.session['requestedLocation']['lat'],
+                   booking='True', Creator=u,
+                   timeFrom='2019-06-21 08:30', timeTo='2019-06-21 21:30',
+                   ifPlaceNum=True, placeNum=60,
+                   dayCreated=django.utils.timezone.now())
         e.save()
-        #e.EventTypes.set(t)
+        e.EventTypes.add(t)
+        e.save()
         print("pass")
         return redirect("/")
     elif request.method=='GET':
         template = loader.get_template("EventCreate.html")
-        Events={
-
+        request.session['requestedLocation']={
+            'lng': request.GET.get('lng'),
+            'lat': request.GET.get('lat'),
         }
-        return HttpResponse(template.render(Events, request))
+        res={}
+        return HttpResponse(template.render(res, request))
 
 def Find(request):
     Events = {}

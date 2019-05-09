@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Eventak',
     'psycopg2',
     'rest_framework',
+    'tempus_dominus',
 ]
 
 MIDDLEWARE = [

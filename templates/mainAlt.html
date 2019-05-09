@@ -116,7 +116,7 @@
         marker = placeMarkerAndPanTo(e.latLng, map);
         markerInd++;
         var infowindow = new google.maps.InfoWindow({
-          content: '<button type="button" class="btn btn-info" onclick="createEv('+markerInd+')">Create Event</button>',
+          content: '<div id="mark'+markerInd+'" ><button type="button" class="btn btn-info" onclick="createEv('+e.latLng.lng+','+e.latLng.lat+','+markerInd+')">Create Event</button></div>',
           marker:marker,
         });
 
@@ -178,6 +178,31 @@
       else{
         $("#main").css("display","none");
       }
+    }
+
+    function createEv(lng,lat,mark){
+      $.ajax({
+          url: '/EventCreate/'/*+ $(this).parent().attr('id')*/,
+          data: {
+            'lng':lng,
+            'lat':lat
+          }
+          type: 'GET',
+          success: function(result) {
+            $("#mark"+mark).html(result);
+            $("#postCreation").click(function(){
+              $.ajax({
+                  url: '/EventCreate/',
+                  type: 'POST',
+                  data: $('#evCreateForm').serialize(),
+                  headers: {'X-CSRFToken':'{{ csrf_token }}'},
+                  success: function(result) {
+                      $("#mark"+mark).html("Event Created");
+                  }
+              });
+            });
+          }
+      });
     }
 
     $(".nav-link").click(function(){
@@ -282,9 +307,8 @@
                 $(".deleteRes").click(function(){
                   var elem = $(this).parent().parent().attr('id');
                   alert(elem);
-                  $("#"+elem).remove();
                   $.ajax({
-                      url: '/deleteRes/' + elem + '/',
+                      url: '/cancelRes/' + elem + '/',
                       type: 'DELETE',
                       headers: {'X-CSRFToken':'{{ csrf_token }}'},
                       success: function(result) {
@@ -310,7 +334,7 @@
                   alert(elem);
                   $("#"+elem).remove();
                   $.ajax({
-                      url: '/deleteEv/' + elem + '/',
+                      url: '/cancelEv/' + elem + '/',
                       type: 'DELETE',
                       headers: {'X-CSRFToken':'{{ csrf_token }}'},
                       success: function(result) {

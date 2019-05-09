@@ -1,11 +1,13 @@
 {% extends "main.html" %}
 {% block content %}
 <h1 class="title">Sign in</h1>
-<form method="POST" action="/EventCreate/">{% csrf_token %}
+<form method="post" action="/EventCreate/">{% csrf_token %}
   <label for="EventName">Event Name: </label><input type="text" placeholder="EventName" name="EventName"/><br/>
   <label for="description">Description: </label><input type="text" placeholder="description" name="description"/><br/>
   <label for="location">Location: </label><input type="text" placeholder="location" name="location"/><br/>
   <label for="city">city: </label><input type="text" placeholder="city" name="city"/><br/>
+  <label for="DateTime">Date Time: </label><br/>
+  {{ form }}
   <input type="submit" value="login"/>
 </form>
 
