@@ -162,7 +162,7 @@ def CreateEvent(request): #EDIT NEEDED
                    locLong=request.session['requestedLocation']['lng'],
                    locLat=request.session['requestedLocation']['lat'],
                    booking='True', Creator=u,
-                   timeFrom='2019-06-21 08:30', timeTo='2019-06-21 21:30',
+                   timeFrom=request.POST.get('Date_From'), timeTo=request.POST.get('Date_To'),
                    ifPlaceNum=True, placeNum=60,
                    dayCreated=django.utils.timezone.now())
         e.save()

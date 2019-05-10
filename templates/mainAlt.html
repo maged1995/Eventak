@@ -228,7 +228,14 @@
               $.ajax({
                   url: '/EventCreate/',
                   type: 'POST',
-                  data: $('#evCreateForm').serialize(),
+                  data: {
+                    'EventName':$('EventName').val(),
+                    'description':$('EventName').val(),
+                    'location':$('EventName').val(),
+                    'city':$('EventName').val(),
+                    'Date_From':$('Date_From').val(),
+                    'Date_To':$('Date_To').val(),
+                  }
                   headers: {'X-CSRFToken':'{{ csrf_token }}'},
                   success: function(result) {
                       $("#mark"+mark).html("Event Created");
