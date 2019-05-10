@@ -51,3 +51,52 @@ def PhoneLogin(request):
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
+
+def Find(request):
+    if request.method == 'GET':
+        Events = {}
+        if request.GET.get('city'):
+            if request.GET.get('eventType'):
+                print("PASS")
+                types = EventTypes.objects.all().filter(name=request.GET.get('eventType'))
+                if (types):
+                    Events = events.objects.all().filter(city=request.GET.get('city'), EventTypes = types[0])
+                else:
+                    Events = events.objects.all().filter(city=request.GET.get('city'))
+            else:
+                Events = events.objects.all().filter(city=request.GET.get('city'))
+        elif request.GET.get('eventType'):
+            print("pass")
+            types = EventTypes.objects.all().filter(name=request.GET.get('eventType'))
+            if (types):
+                print("Pass")
+                Events = events.objects.all().filter(EventTypes = types[0])
+        else:
+            Events = events.objects.all()
+        #u = Users.objects.get(id=Event.CreatorID.id)
+        if(Events):
+            E = [{} for _ in range(len(Events))]
+            for i in range(0,len(Events)):
+                E[i]['Name']=str(Events[i].name),
+                E[i]['description']=Events[i].description
+                E[i]['location']=Events[i].location
+                E[i]['city']=Events[i].city
+                E[i]['Map']={
+                    'locLong':Events[i].locLong,
+                    'locLat':Events[i].locLat
+                }
+                E[i]['booking']= str(Events[i].booking)
+                E[i]['CreatorID']=Events[i].Creator.id
+
+            res = {
+                'Found':'True',
+                'Events':E
+                    #'day':Event.day,
+
+            }
+        else:
+            res = {
+                'Found':'False',
+            }
+        return JsonResponse(res)
+

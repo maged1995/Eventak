@@ -1,8 +1,9 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak.models import events, Users, reservations, EventTypes
-import random, string
+from Eventak.models import events, Users, Reservations, EventTypes
+from .forms import datetimeform
+import random, string, django
 
 def index(request):
     template = loader.get_template('index.html')
@@ -170,13 +171,15 @@ def CreateEvent(request): #EDIT NEEDED
         print("pass")
         return redirect("/")
     elif request.method=='GET':
-        template = loader.get_template("EventCreate.html")
-        request.session['requestedLocation']={
+        res={
             'lng': request.GET.get('lng'),
             'lat': request.GET.get('lat'),
+	    'mark': request.GET.get('mark'),
         }
-        res={}
-        return HttpResponse(template.render(res, request))
+        request.session['requestedLocation'] = res
+        form = datetimeform()
+        template = loader.get_template("EventCreate.html")
+        return HttpResponse(template.render({'form': form}, request))
 
 def Find(request):
     Events = {}
