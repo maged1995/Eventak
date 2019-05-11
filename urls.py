@@ -34,6 +34,7 @@ urlpatterns = [
     path('EventGet/', views.Find, name= 'eventGet'),
     path('active/', views.activeEvents, name='getEventsLocation'),
     path('EventView/', views.EventView, name='View Event'),
+    path('attend/', views.attend, name='View Event'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
     path('PhoneEventGet/', Phone.Find, name= 'PhoneEventGet'),
     path('requestFriendship/', views.Find, name= 'Request Friendship'),

@@ -188,16 +188,17 @@
                   		content: result,
                 	  });
                     infowindow.open(map, m);
-                    $("#EvView"+m.evID).click(function(){
+                    $("#EvAtt"+m.evID).click(function(){
                       $.ajax({
-                          url: '/EventCreate/',
+                          url: '/attend/',
                           type: 'POST',
                           data: {
                             'evID':m.evID,
                           },
                           headers: {'X-CSRFToken':'{{ csrf_token }}'},
                           success: function(result) {
-                                $("#EvView"+m.evID).html(result);
+                            console.log(result);
+                                $("#EvAttend"+m.evID).html(result);
                           }
                       });
                     });

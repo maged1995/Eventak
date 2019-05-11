@@ -195,7 +195,8 @@ def attend(data):
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not ue:
             newGo = UserEvent(user=u, event=e, stat=1)
-            return '<h2>Going</h2>'
+            newGo.save()
+            return JsonResponse({'Attend': 'success'})
 
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
