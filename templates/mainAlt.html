@@ -170,23 +170,24 @@
 	    /*var infowindow = new google.maps.InfoWindow({
               content: '<div>Hola</div>'
             });*/
-      	    var marker = new google.maps.Marker({
+      	    activeEventsMarkers[i] = new google.maps.Marker({
           		position: myLatLng,
           		map: map,
-              evID: result['ev'][i]['id']
+              evID: result['ev'][i]['id'],
         	  });
-            activeEventsMarkers[i] = marker;
+	console.log(activeEventsMarkers[i].evID);
       	    activeEventsMarkers[i].addListener('click', function() {
+	      var m = this;
+	      console.log(m.evID);
               $.ajax({
                   url: '/EventView/'/*+ $(this).parent().attr('id')*/,
                   type: 'GET',
-                  data: {'evID':activeEventsMarkers[i].evID},
+                  data: {'evID': m.evID},
                   success: function(result) {
                     var infowindow = new google.maps.InfoWindow({
-                  		content: '<div id="evID'+activeEventsMarkers[i].evID+'""></div>',
+                  		content: result,
                 	  });
-                    $('#evID'+activeEventsMarkers[i].evID).html(result);
-                    infowindow.open(map, activeEventsMarkers[i]);
+                    infowindow.open(map, m); 
                   },
                 });
 

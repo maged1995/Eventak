@@ -63,23 +63,23 @@ def activeEvents(request):
 
 def EventView(request):
     template = loader.get_template("EventView.html")
-    Events = events.objects.get(id=request.GET.get("evID"))
+    Event = events.objects.get(id=request.GET.get("evID"))
     res = {
-        'Name':Events[i].name,
-        'description':Events[i].description,
-        'location':Events[i].location,
-        'city':Events[i].city,
-        'id':Events[i].id,
+        'Name':Event.name,
+        'description':Event.description,
+        'location':Event.location,
+        'city':Event.city,
+        'id':Event.id,
         #'Map':{
         #    'locLong':Events[i].locLong,
         #    'locLat':Events[i].locLat
         #},
-        'booking': str(Events[i].booking),
-        'CreatorName':Events[i].Creator.name,
-        'CreatorID':Events[i].Creator.id,
-        'timeFrom':Events[i].timeFrom,
-        'timeTo':Events[i].timeTo,
-        'placeNum':Events[i].placeNum,
+        'booking': str(Event.booking),
+        'CreatorName':Event.Creator.displayName,
+        'CreatorID':Event.Creator.id,
+        'timeFrom':Event.timeFrom,
+        'timeTo':Event.timeTo,
+        'placeNum':Event.placeNum,
         #EventTypes!!!
     }
     return HttpResponse(template.render(res, request))
