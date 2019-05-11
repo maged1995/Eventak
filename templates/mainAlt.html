@@ -184,11 +184,13 @@
                   type: 'GET',
                   data: {'evID': m.evID},
                   success: function(result) {
+			console.log('in');
                     var infowindow = new google.maps.InfoWindow({
                   		content: result,
                 	  });
                     infowindow.open(map, m);
-                    $("#EvAtt"+m.evID).click(function(){
+                    $("#EvAtt"+m.evID+"").click(function(){
+		      console.log('in');
                       $.ajax({
                           url: '/attend/',
                           type: 'POST',

@@ -188,10 +188,10 @@ def getDaysNum(a):
     m1 = [1,3,5,7,8,10,12]
     return True
 
-def attend(data):
+def attend(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        e = events.objects.get(id=request.GET.get("evID"))
+        e = events.objects.get(id=request.POST.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not ue:
             newGo = UserEvent(user=u, event=e, stat=1)
@@ -328,19 +328,19 @@ def displayMyEvents(request):
     return HttpResponse(template.render(res, request))
 
 def displayReservations(request):
-    us = Users.objects.get(id=1)   #request.session['User']["UserInfo"]["username"])
+    us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])   #request.session['User']["UserInfo"]["username"])
     Reservations = UserEvent.objects.all().filter(user=us)
-    if (reservations):
+    if (Reservations):
         E = [{} for _ in range(len(Reservations))]
         for i in range(0,len(Reservations)):
             Event = Reservations[i].event
-            E[i]['Name']=Reservations[i].event.name
-            E[i]['description']=Reservations[i].event.description
-            E[i]['location']=Reservations[i].event.location
-            E[i]['city']=Reservations[i].event.city
-            E[i]['id']=Reservations[i].event.id
-            E[i]['booking']= str(Reservations[i].event.booking)
-            E[i]['CreatorID']=Reservations[i].event.Creator.id
+            E[i]['name']=Event.name
+            E[i]['Description']=Event.description
+            E[i]['location']=Event.location
+            E[i]['city']=Event.city
+            E[i]['id']=Event.id
+            E[i]['booking']= str(Event.booking)
+            E[i]['CreatorID']=Event.Creator.id
         res = {
             'Found':'True',
             'Events':E
