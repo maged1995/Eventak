@@ -328,22 +328,18 @@ def displayMyEvents(request):
 
 def displayReservations(request):
     us = Users.objects.get(id=1)   #request.session['User']["UserInfo"]["username"])
-    Reservations = reservations.objects.all().filter(user=us)
+    Reservations = UserEvent.objects.all().filter(user=us)
     if (reservations):
         E = [{} for _ in range(len(Reservations))]
         for i in range(0,len(Reservations)):
             Event = Reservations[i].event
-            E[i]['Name']=Event.name
-            E[i]['description']=Event.description
-            E[i]['location']=Event.location
-            E[i]['city']=Event.city
-            E[i]['id']=Event.id
-            E[i]['Map']={
-                'locLong':Event.locLong,
-                'locLat':Event.locLat
-            }
-            E[i]['booking']= str(Event.booking)
-            E[i]['CreatorID']=Event.Creator.id
+            E[i]['Name']=Reservations[i].event.name
+            E[i]['description']=Reservations[i].event.description
+            E[i]['location']=Reservations[i].event.location
+            E[i]['city']=Reservations[i].event.city
+            E[i]['id']=Reservations[i].event.id
+            E[i]['booking']= str(Reservations[i].event.booking)
+            E[i]['CreatorID']=Reservations[i].event.Creator.id
         res = {
             'Found':'True',
             'Events':E
