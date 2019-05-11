@@ -32,6 +32,8 @@ urlpatterns = [
     path('map/', views.map, name='map'),
     path('EventCreate/', views.CreateEvent, name='eventCreate'),
     path('EventGet/', views.Find, name= 'eventGet'),
+    path('active/', views.activeEvents, name='getEventsLocation'),
+    path('EventView/', views.activeEvents, name='View Event'),
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
     path('PhoneEventGet/', Phone.Find, name= 'PhoneEventGet'),
     path('requestFriendship/', views.Find, name= 'Request Friendship'),
@@ -41,6 +43,5 @@ urlpatterns = [
     path('', views.map, name='map'),
     path('ajax/validate_username/', views.validate_username, name='validate_username'),
     path('ajax/get_Days_Num/', views.GetDaysNum, name='validate_username'),
-    path('active/', views.activeEvents, name='getEventsLocation'),
     path('initDb/', insertItems.init, name='initiate Database'),
 ]

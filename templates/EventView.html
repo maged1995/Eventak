@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block content %}
+{{id}}
+{{name}}
+{{CreatorID}}
+{{CreatorName}}
+{{description}}
+{{location}}
+<div class='ifBooking'>{{booking}}</div>
+{{timeFrom}}
+{{timeTo}}
+{{id}}
+{% if placeNum > '0' %}
+  {{placeNum}}
+  {{numOfGoing}}
+{% endif %}
+
+{% endblock %}

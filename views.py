@@ -50,19 +50,39 @@ def activeEvents(request):
     E = [{} for _ in range(len(Events))]
     for i in range(0,len(Events)):
         E[i]['Name']=str(Events[i].name)
-        E[i]['description']=Events[i].description
-        E[i]['location']=Events[i].location
-        E[i]['city']=Events[i].city
         E[i]['Map']={
             'locLong':Events[i].locLong,
             'locLat':Events[i].locLat
         }
-        E[i]['booking']= str(Events[i].booking)
         E[i]['CreatorID']=Events[i].Creator.id
+        E[i]['id']=Events[i].id
     evs = {
         'ev':E,
     }
     return JsonResponse(evs)
+
+def EventView(request):
+    template = loader.get_template("EventView.html")
+    Events = events.objects.get(id=request.GET.get("evID"))
+    res = {
+        'Name':Events[i].name,
+        'description':Events[i].description,
+        'location':Events[i].location,
+        'city':Events[i].city,
+        'id':Events[i].id,
+        #'Map':{
+        #    'locLong':Events[i].locLong,
+        #    'locLat':Events[i].locLat
+        #},
+        'booking': str(Events[i].booking),
+        'CreatorName':Events[i].Creator.name,
+        'CreatorID':Events[i].Creator.id,
+        'timeFrom':Events[i].timeFrom,
+        'timeTo':Events[i].timeTo,
+        'placeNum':Events[i].placeNum,
+        #EventTypes!!!
+    }
+    return HttpResponse(template.render(res, request))
 
 
 def login(request):

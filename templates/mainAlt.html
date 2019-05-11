@@ -18,7 +18,7 @@
 		</div>
 	</body>
   <script>
-    var map, infoWindow, markerInd=1, markers = [];
+    var map, infoWindow, markerInd=1, activeEventsMarkers = [];
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
@@ -170,15 +170,24 @@
 	    /*var infowindow = new google.maps.InfoWindow({
               content: '<div>Hola</div>'
             });*/
-	    var marker = new google.maps.Marker({
-    		position: myLatLng,
-    		map: map
-  	    });
-  	    var infowindow = new google.maps.InfoWindow({
-    		content: 'jo'
-  	    });
-	    marker.addListener('click', function() {
-                infowindow.open(map, marker);
+      	    var marker = new google.maps.Marker({
+          		position: myLatLng,
+          		map: map,
+              evID: result['ev'][i]['id']
+        	  });
+      	    marker.addListener('click', function() {
+              $.ajax({
+                  url: '/EventView/'/*+ $(this).parent().attr('id')*/,
+                  type: 'GET',
+                  data: {'evID':marker.evID},
+                  success: function(result) {
+                    var infowindow = new google.maps.InfoWindow({
+                  		content: result,
+                	  });
+                    infowindow.open(map, marker);
+                  },
+                });
+
             });
           }
         }
