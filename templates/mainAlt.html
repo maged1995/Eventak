@@ -189,21 +189,6 @@
                   		content: result,
                 	  });
                     infowindow.open(map, m);
-                    $("#EvAtt"+m.evID+"").click(function(){
-		      console.log('in');
-                      $.ajax({
-                          url: '/attend/',
-                          type: 'POST',
-                          data: {
-                            'evID':m.evID,
-                          },
-                          headers: {'X-CSRFToken':'{{ csrf_token }}'},
-                          success: function(result) {
-                            console.log(result);
-                                $("#EvAttend"+m.evID).html(result);
-                          }
-                      });
-                    });
                   },
                 });
 
@@ -212,6 +197,20 @@
         }
     });
 
+    function attend(id){
+      $.ajax({
+          url: '/attend/',
+          type: 'POST',
+          data: {
+            'evID':id,
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            console.log(result);
+                $("#EvAttend"+m.evID).html(result);
+          }
+      });
+    }
 
     var ClickEventHandler = function(map) {
         this.map = map;
