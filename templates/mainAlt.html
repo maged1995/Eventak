@@ -187,7 +187,20 @@
                     var infowindow = new google.maps.InfoWindow({
                   		content: result,
                 	  });
-                    infowindow.open(map, m); 
+                    infowindow.open(map, m);
+                    $("#EvView"+m.evID).click(function(){
+                      $.ajax({
+                          url: '/EventCreate/',
+                          type: 'POST',
+                          data: {
+                            'evID':m.evID,
+                          },
+                          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+                          success: function(result) {
+                                $("#EvView"+m.evID).html(result);
+                          }
+                      });
+                    });
                   },
                 });
 

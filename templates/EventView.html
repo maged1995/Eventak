@@ -9,10 +9,12 @@
 <div class='ifBooking'>{{booking}}</div>
 {{timeFrom}}
 {{timeTo}}
-{{id}}
 {% if placeNum > '0' %}
   {{placeNum}}
   {{numOfGoing}}
 {% endif %}
+<br/>
+Going?
+<button type="button" id="EvView{{id}}" class="btn btn-info">Yes</button>
 
 {% endblock %}

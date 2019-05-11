@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak.models import events, Users, Reservations, EventTypes
+from Eventak.models import events, Users, Reservations, EventTypes, UserEvent
 from .forms import datetimeform
 import random, string, django
 
@@ -188,6 +188,15 @@ def getDaysNum(a):
     m1 = [1,3,5,7,8,10,12]
     return True
 
+def attend(data):
+    if request.method == 'POST':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        e = events.objects.get(id=request.GET.get("evID"))
+        ue = UserEvent.objects.all().filter(user=u, event=e)
+        if not ue:
+            newGo = UserEvent(user=u, event=e, stat=1)
+            return '<h2>Going</h2>'
+
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
         #type= EventTypes(name="Cinema")
@@ -212,15 +221,18 @@ def CreateEvent(request): #EDIT NEEDED
         print("pass")
         return redirect("/")
     elif request.method=='GET':
-        res={
-            'lng': request.GET.get('lng'),
-            'lat': request.GET.get('lat'),
-	    'mark': request.GET.get('mark'),
-        }
-        request.session['requestedLocation'] = res
-        form = datetimeform()
-        template = loader.get_template("EventCreate.html")
-        return HttpResponse(template.render({'form': form}, request))
+        if request.session['UserInfo']=='':
+            res={
+                'lng': request.GET.get('lng'),
+                'lat': request.GET.get('lat'),
+    	        'mark': request.GET.get('mark'),
+            }
+            request.session['requestedLocation'] = res
+            form = datetimeform()
+            template = loader.get_template("EventCreate.html")
+            return HttpResponse(template.render({'form': form}, request))
+        else:
+            return 'Please Sign in'
 
 def Find(request):
     Events = {}
