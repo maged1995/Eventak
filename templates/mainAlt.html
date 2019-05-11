@@ -18,7 +18,7 @@
 		</div>
 	</body>
   <script>
-    var map, infoWindow, markerInd=1;
+    var map, infoWindow, markerInd=1, markers = [];
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
@@ -157,6 +157,34 @@
         }
     }
 
+    $.ajax({
+        url: '/active/'/*+ $(this).parent().attr('id')*/,
+        type: 'GET',
+        success: function(result) {
+          console.log(Number(result['ev'][0]['Map']['locLat']));
+          for(var i = 0; i<result['ev'].length; i++){
+            var myLatLng = {
+              "lat": Number(result['ev'][i]['Map']['locLat']),
+              "lng": Number(result['ev'][i]['Map']['locLong'])
+            };
+	    /*var infowindow = new google.maps.InfoWindow({
+              content: '<div>Hola</div>'
+            });*/
+	    var marker = new google.maps.Marker({
+    		position: myLatLng,
+    		map: map
+  	    });
+  	    var infowindow = new google.maps.InfoWindow({
+    		content: 'jo'
+  	    });
+	    marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
+          }
+        }
+    });
+
+
     var ClickEventHandler = function(map) {
         this.map = map;
 	this.placesService = new google.maps.places.PlacesService(map);
@@ -235,7 +263,7 @@
                     'city':$('EventName').val(),
                     'Date_From':$('Date_From').val(),
                     'Date_To':$('Date_To').val(),
-                  }
+                  },
                   headers: {'X-CSRFToken':'{{ csrf_token }}'},
                   success: function(result) {
                       $("#mark"+mark).html("Event Created");

@@ -45,6 +45,26 @@ def index(request):
     print(request.session.get('UserInfo'))
     return HttpResponse(template.render(Events, request))
 
+def activeEvents(request):
+    Events = events.objects.all()
+    E = [{} for _ in range(len(Events))]
+    for i in range(0,len(Events)):
+        E[i]['Name']=str(Events[i].name)
+        E[i]['description']=Events[i].description
+        E[i]['location']=Events[i].location
+        E[i]['city']=Events[i].city
+        E[i]['Map']={
+            'locLong':Events[i].locLong,
+            'locLat':Events[i].locLat
+        }
+        E[i]['booking']= str(Events[i].booking)
+        E[i]['CreatorID']=Events[i].Creator.id
+    evs = {
+        'ev':E,
+    }
+    return JsonResponse(evs)
+
+
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -154,7 +174,8 @@ def CreateEvent(request): #EDIT NEEDED
         #type.save()
         t = EventTypes.objects.all().filter(name="Cinema")
         print(request.POST.get('EventName'))
-        u = Users.objects.get(id=1)
+        print(request.session['requestedLocation']['lng'])
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         e = events(name = request.POST.get('EventName'),
                    description = request.POST.get('description'),
                    location= request.POST.get('location'),
@@ -166,8 +187,8 @@ def CreateEvent(request): #EDIT NEEDED
                    ifPlaceNum=True, placeNum=60,
                    dayCreated=django.utils.timezone.now())
         e.save()
-        e.EventTypes.add(t)
-        e.save()
+        #e.EventTypes.add(t)
+        #e.save()
         print("pass")
         return redirect("/")
     elif request.method=='GET':

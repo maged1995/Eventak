@@ -41,5 +41,6 @@ urlpatterns = [
     path('', views.map, name='map'),
     path('ajax/validate_username/', views.validate_username, name='validate_username'),
     path('ajax/get_Days_Num/', views.GetDaysNum, name='validate_username'),
+    path('active/', views.activeEvents, name='getEventsLocation'),
     path('initDb/', insertItems.init, name='initiate Database'),
 ]
