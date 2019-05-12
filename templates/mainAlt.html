@@ -207,7 +207,7 @@
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
             console.log(result);
-                $("#EvAttend"+m.evID).html(result);
+                $("#EvAttend"+id).html(result);
           }
       });
     }

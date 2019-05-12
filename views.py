@@ -193,10 +193,11 @@ def attend(request):
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         e = events.objects.get(id=request.POST.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
-        if not ue:
+        if not len(ue)>0:
             newGo = UserEvent(user=u, event=e, stat=1)
             newGo.save()
             return JsonResponse({'Attend': 'success'})
+        return JsonResponse({'Attend': 'Failure'})
 
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
@@ -222,7 +223,7 @@ def CreateEvent(request): #EDIT NEEDED
         print("pass")
         return redirect("/")
     elif request.method=='GET':
-        if request.session['UserInfo']=='':
+        if request.session['UserInfo']!='':
             res={
                 'lng': request.GET.get('lng'),
                 'lat': request.GET.get('lat'),
@@ -233,7 +234,7 @@ def CreateEvent(request): #EDIT NEEDED
             template = loader.get_template("EventCreate.html")
             return HttpResponse(template.render({'form': form}, request))
         else:
-            return 'Please Sign in'
+            return HttpResponse('Please Sign in')
 
 def Find(request):
     Events = {}
@@ -329,7 +330,7 @@ def displayMyEvents(request):
 
 def displayReservations(request):
     us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])   #request.session['User']["UserInfo"]["username"])
-    Reservations = UserEvent.objects.all().filter(user=us)
+    Reservations = UserEvent.objects.all().filter(user=us, stat=1)
     if (Reservations):
         E = [{} for _ in range(len(Reservations))]
         for i in range(0,len(Reservations)):
