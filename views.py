@@ -311,6 +311,8 @@ def displayMyEvents(request):
                 'locLong':Events[i].locLong,
                 'locLat':Events[i].locLat
             }
+            E[i]['timeFrom']=Events[i].timeFrom,
+            E[i]['timeTo']=Events[i].timeTo,
             E[i]['booking']= str(Events[i].booking)
             E[i]['Creator']=Events[i].Creator.id
         print("pass")
@@ -342,6 +344,7 @@ def displayReservations(request):
             E[i]['id']=Event.id
             E[i]['booking']= str(Event.booking)
             E[i]['CreatorID']=Event.Creator.id
+            E[i]['reservationsId']=Reservations[i].id
         res = {
             'Found':'True',
             'Events':E
@@ -366,11 +369,11 @@ def CancelRes(request, event):
     if request.method == 'DELETE':
         e = events.objects.get(id=event)
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        res = UserEvent.objects.get(event=e, user=u)
-        res.stat = 0
-        res.save()
+        res = UserEvent.objects.all().filter(event=e, user=u)
+        res[0].stat = 0
+        res[0].save()
         print(event)
-        return JsonResponse({'request':'success'})
+        return JsonResponse({'request':str(res[0].event.id)})
 
 def findUser(request):
     if request.method == 'GET':
