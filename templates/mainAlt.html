@@ -417,7 +417,7 @@
               success: function(result) {
                 $("#loadbasic").html(result)
                 alert("pass");
-                $(".deleteRes").click(function(){
+                $(".cancelRes").click(function(){
                   var elem = $(this).parent().parent().attr('id');
                   alert(elem);
                   $.ajax({
@@ -425,7 +425,8 @@
                       type: 'DELETE',
                       headers: {'X-CSRFToken':'{{ csrf_token }}'},
                       success: function(result) {
-                          $("#"+elem).remove();
+                          $("#"+elem).html(result['request']);
+			alert(result['request']);
                       }
                   });
                 });
