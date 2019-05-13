@@ -163,36 +163,38 @@
         success: function(result) {
           console.log(Number(result['ev'][0]['Map']['locLat']));
           for(var i = 0; i<result['ev'].length; i++){
-            var myLatLng = {
-              "lat": Number(result['ev'][i]['Map']['locLat']),
-              "lng": Number(result['ev'][i]['Map']['locLong'])
-            };
-	    /*var infowindow = new google.maps.InfoWindow({
-              content: '<div>Hola</div>'
-            });*/
-      	    activeEventsMarkers[i] = new google.maps.Marker({
-          		position: myLatLng,
-          		map: map,
-              evID: result['ev'][i]['id'],
-        	  });
-	console.log(activeEventsMarkers[i].evID);
-      	    activeEventsMarkers[i].addListener('click', function() {
-	      var m = this;
-	      console.log(m.evID);
-              $.ajax({
-                  url: '/EventView/'/*+ $(this).parent().attr('id')*/,
-                  type: 'GET',
-                  data: {'evID': m.evID},
-                  success: function(result) {
-			console.log('in');
-                    var infowindow = new google.maps.InfoWindow({
-                  		content: result,
-                	  });
-                    infowindow.open(map, m);
-                  },
-                });
+            if(result['ev'][i]['show']){
+              var myLatLng = {
+                "lat": Number(result['ev'][i]['Map']['locLat']),
+                "lng": Number(result['ev'][i]['Map']['locLong'])
+              };
+  	    /*var infowindow = new google.maps.InfoWindow({
+                content: '<div>Hola</div>'
+              });*/
+        	    activeEventsMarkers[i] = new google.maps.Marker({
+            		position: myLatLng,
+            		map: map,
+                evID: result['ev'][i]['id'],
+          	  });
+  	console.log(activeEventsMarkers[i].evID);
+        	    activeEventsMarkers[i].addListener('click', function() {
+  	      var m = this;
+  	      console.log(m.evID);
+                $.ajax({
+                    url: '/EventView/'/*+ $(this).parent().attr('id')*/,
+                    type: 'GET',
+                    data: {'evID': m.evID},
+                    success: function(result) {
+  			console.log('in');
+                      var infowindow = new google.maps.InfoWindow({
+                    		content: result,
+                  	  });
+                      infowindow.open(map, m);
+                    },
+                  });
 
-            });
+              });
+            }
           }
         }
     });
@@ -208,6 +210,21 @@
           success: function(result) {
             console.log(result);
                 $("#EvAttend"+id).html(result);
+          }
+      });
+    }
+
+    function hide(id){
+      $.ajax({
+          url: '/EventView/',
+          type: 'DELETE',
+          data: {
+            'evID':id,
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            console.log(result);
+                $("#EvHide"+id).html(result);
           }
       });
     }

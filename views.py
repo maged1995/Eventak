@@ -49,40 +49,67 @@ def activeEvents(request):
     Events = events.objects.all()
     E = [{} for _ in range(len(Events))]
     for i in range(0,len(Events)):
-        E[i]['Name']=str(Events[i].name)
-        E[i]['Map']={
-            'locLong':Events[i].locLong,
-            'locLat':Events[i].locLat
-        }
-        E[i]['CreatorID']=Events[i].Creator.id
-        E[i]['id']=Events[i].id
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ue = UserEvent.objects.all().filter(user=u, event=Events[i])
+        if len(ue) != 0:
+            if (ue.view):
+                E[i]['Name']=str(Events[i].name)
+                E[i]['Map']={
+                    'locLong':Events[i].locLong,
+                    'locLat':Events[i].locLat
+                }
+                E[i]['CreatorID']=Events[i].Creator.id
+                E[i]['id']=Events[i].id
+                E[i]['show']=Events[i].show
+            else:
+                E[i]['show']=Events[i].show
+        else:
+            E[i]['Name']=str(Events[i].name)
+            E[i]['Map']={
+                'locLong':Events[i].locLong,
+                'locLat':Events[i].locLat
+            }
+            E[i]['CreatorID']=Events[i].Creator.id
+            E[i]['id']=Events[i].id
+            E[i]['show']=Events[i].show
     evs = {
         'ev':E,
     }
     return JsonResponse(evs)
 
 def EventView(request):
-    template = loader.get_template("EventView.html")
-    Event = events.objects.get(id=request.GET.get("evID"))
-    res = {
-        'Name':Event.name,
-        'description':Event.description,
-        'location':Event.location,
-        'city':Event.city,
-        'id':Event.id,
-        #'Map':{
-        #    'locLong':Events[i].locLong,
-        #    'locLat':Events[i].locLat
-        #},
-        'booking': str(Event.booking),
-        'CreatorName':Event.Creator.displayName,
-        'CreatorID':Event.Creator.id,
-        'timeFrom':Event.timeFrom,
-        'timeTo':Event.timeTo,
-        'placeNum':Event.placeNum,
-        #EventTypes!!!
-    }
-    return HttpResponse(template.render(res, request))
+    if request.method == 'DELETE':
+        Event = events.objects.get(id=request.GET.get("evID"))
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ue = UserEvent.objects.all().filter(user=u, event=Event)
+        ue.view = False
+        ue.save()
+        return JsonResponse({'Hiding':'Success'})
+    else:
+        template = loader.get_template("EventView.html")
+        Event = events.objects.get(id=request.GET.get("evID"))
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ue = UserEvent.objects.all().filter(user=u, event=Event)
+        res = {
+            'Name':Event.name,
+            'description':Event.description,
+            'location':Event.location,
+            'city':Event.city,
+            'id':Event.id,
+            #'Map':{
+            #    'locLong':Events[i].locLong,
+            #    'locLat':Events[i].locLat
+            #},
+            'booking': str(Event.booking),
+            'CreatorName':Event.Creator.displayName,
+            'CreatorID':Event.Creator.id,
+            'timeFrom':Event.timeFrom,
+            'timeTo':Event.timeTo,
+            'placeNum':Event.placeNum,
+            'attending':ue.stat,
+            #EventTypes!!!
+        }
+        return HttpResponse(template.render(res, request))
 
 
 def login(request):
@@ -146,7 +173,7 @@ def Signup(request):
         else:
             u = Users(birthDate="1995-06-21",
                       username = request.POST.get("username"),
-                      email = request.POST.get("email"))
+                      email = request.POST.get("email"), verified=True)
             u.hash_password("Leila")
             u.save()
     if request.method == "GET":
@@ -194,7 +221,7 @@ def attend(request):
         e = events.objects.get(id=request.POST.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not len(ue)>0:
-            newGo = UserEvent(user=u, event=e, stat=1)
+            newGo = UserEvent(user=u, event=e, stat=1, view=True)
             newGo.save()
             return JsonResponse({'Attend': 'success'})
         return JsonResponse({'Attend': 'Failure'})

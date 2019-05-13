@@ -11,7 +11,8 @@ class Users(models.Model):
     profilePic = models.TextField()
     birthDate = models.DateField()
     phoneNumber = models.TextField()
-    dayCreated = models.DateTimeField()
+    dayCreated = models.DateTimeField(null=True, blank=True)
+    verified = models.BooleanField(null=False, blank=False)
 
     def hash_password(self, password):
         self.passwordHash = pwd_context.encrypt(password)
@@ -45,12 +46,12 @@ class events(models.Model):
     city = models.CharField(max_length=20, null=False, blank=False)
     booking = models.BooleanField(null=False)
     Creator = models.ForeignKey('Users', on_delete=models.CASCADE)
-    timeFrom = models.DateTimeField()
-    timeTo = models.DateTimeField()
+    timeFrom = models.DateTimeField(null=True, blank=True)
+    timeTo = models.DateTimeField(null=True, blank=True)
     ifPlaceNum = models.BooleanField(null=False)
     placeNum = models.IntegerField(null=True, blank=True)  #### check number of of users currently reserved
     EventTypes = models.ManyToManyField('EventTypes')
-    dayCreated = models.DateTimeField()
+    dayCreated = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return self.name
 
@@ -81,4 +82,5 @@ class UserEvent(models.Model):
     user = models.ForeignKey('Users', on_delete=models.CASCADE, null=False, blank=False)
     event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
     stat = models.IntegerField(null=False, blank=False)
+    view = booking = models.BooleanField(null=False, blank=False)
     #time = models.DateTimeField(null=False, blank=False)

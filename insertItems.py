@@ -9,7 +9,7 @@ def init(request):
     type= EventTypes(name="Cinema")
     type.save()
 
-    u = Users(birthDate="1995-06-21",username = "maged95", displayName = "Maged A. Saad", dayCreated=django.utils.timezone.now())
+    u = Users(birthDate="1995-06-21",username = "maged95", displayName = "Maged A. Saad", dayCreated=django.utils.timezone.now(), verified=True)
     u.hash_password("Leila")
     u.save()
 
@@ -27,9 +27,9 @@ def init(request):
 
     e = events.objects.get(id=1)
 
-    R = UserEvent(event= e, user=u, stat=1)
+    R = UserEvent(event= e, user=u, stat=1, view=True)
 
-    u2 = Users(birthDate="1995-06-21",username = "Moh", displayName = "Mohamed Hamed", email="mohamed@gmail.com", dayCreated=django.utils.timezone.now())
+    u2 = Users(birthDate="1995-06-21",username = "Moh", displayName = "Mohamed Hamed", email="mohamed@gmail.com", dayCreated=django.utils.timezone.now(),verified=True)
     u2.hash_password("Leila")
     u2.save()
 
