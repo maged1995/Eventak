@@ -26,7 +26,7 @@ SECRET_KEY = '#r!oj!mfty&2zp+c)7t(s)h)wpufcg3*w#(efj_=eyd44=-l52'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk','35.246.148.56','34.73.71.113', '10.142.0.5']
+ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk','35.246.135.62']
 
 
 # Application definition
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Eventak.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database

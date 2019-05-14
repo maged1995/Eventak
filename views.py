@@ -312,8 +312,8 @@ def Find(request):
 
 def map(request):
     template = loader.get_template('mainAlt.html')
-    if not 'login' in request.session:
-        request.session['User']=''
+    if not 'UserInfo' in request.session:
+        request.session['UserInfo']=''
     if not 'state' in request.session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
         request.session['state']=state

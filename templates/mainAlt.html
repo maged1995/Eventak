@@ -161,7 +161,6 @@
         url: '/active/'/*+ $(this).parent().attr('id')*/,
         type: 'GET',
         success: function(result) {
-          console.log(Number(result['ev'][0]['Map']['locLat']));
           for(var i = 0; i<result['ev'].length; i++){
             if(result['ev'][i]['show']){
               var myLatLng = {
@@ -559,6 +558,6 @@
     */
 
   </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5BEaYPvpke0l_9Fc8ddAe2OmxQmxAp8g&libraries=places&callback=initMap"
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDTtI82dpLLqlQdR90hMQbBycN00z0W8OM&libraries=places&callback=initMap"
   async defer></script>
 </html>

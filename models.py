@@ -82,5 +82,5 @@ class UserEvent(models.Model):
     user = models.ForeignKey('Users', on_delete=models.CASCADE, null=False, blank=False)
     event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
     stat = models.IntegerField(null=False, blank=False)
-    view = booking = models.BooleanField(null=False, blank=False)
+    view = models.BooleanField(null=False, blank=False)
     #time = models.DateTimeField(null=False, blank=False)
