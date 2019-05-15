@@ -49,10 +49,10 @@ def activeEvents(request):
     Events = events.objects.all()
     E = [{} for _ in range(len(Events))]
     for i in range(0,len(Events)):
-        u = Users.objects.get(id=int(request.session['UserInfo']['UserInfo']['id']))
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Events[i])
         if len(ue) != 0:
-            if (ue[0].view):
+            if (ue.view):
                 E[i]['Name']=str(Events[i].name)
                 E[i]['Map']={
                     'locLong':Events[i].locLong,
@@ -60,9 +60,9 @@ def activeEvents(request):
                 }
                 E[i]['CreatorID']=Events[i].Creator.id
                 E[i]['id']=Events[i].id
-                E[i]['show']=ue[0].view
+                E[i]['show']=Events[i].show
             else:
-                E[i]['show']=ue[0].view
+                E[i]['show']=Events[i].show
         else:
             E[i]['Name']=str(Events[i].name)
             E[i]['Map']={
@@ -71,14 +71,15 @@ def activeEvents(request):
             }
             E[i]['CreatorID']=Events[i].Creator.id
             E[i]['id']=Events[i].id
-        evs = {
+            E[i]['show']=Events[i].show
+    evs = {
         'ev':E,
     }
     return JsonResponse(evs)
 
 def EventView(request):
     if request.method == 'DELETE':
-        Event = events.objects.get(id=request.GET.get("evID"))
+        Event = events.objects.get(id=request.DELETE.get("evID"))
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Event)
         ue.view = False
@@ -89,11 +90,6 @@ def EventView(request):
         Event = events.objects.get(id=request.GET.get("evID"))
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Event)
-        if ue:
-            if ue[0] == 1:
-                at = True
-        else:
-            at = False
         res = {
             'Name':Event.name,
             'description':Event.description,
@@ -110,7 +106,7 @@ def EventView(request):
             'timeFrom':Event.timeFrom,
             'timeTo':Event.timeTo,
             'placeNum':Event.placeNum,
-            'attending':at,
+            'attending':ue.stat,
             #EventTypes!!!
         }
         return HttpResponse(template.render(res, request))
@@ -440,3 +436,12 @@ def requestFriendship(request):
             newRel = RelStat(f1id=ru, f2id=u, stat = 2)
             newRel.save()
             return JsonResponse({'request':'success'})
+
+def displayArtists(request):
+    template = loader.get_template('artist.html')
+    u = Users.objects.all().filter(verified=True)
+    res= {
+        'name':u.displayName,
+        'picture':u.profilePic,
+    }
+    return HttpResponse(template.render(res, request))

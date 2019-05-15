@@ -131,6 +131,7 @@ STATIC_ROOT = '/var/www/html/Eventak/Evetak/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     '/var/www/html/Eventak/static/',
+    '/var/www/html/Eventak/prof_pic/',
 ]
 
 STATIC_URL = '/static/'
