@@ -49,10 +49,10 @@ def activeEvents(request):
     Events = events.objects.all()
     E = [{} for _ in range(len(Events))]
     for i in range(0,len(Events)):
-        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        u = Users.objects.get(id=int(request.session['UserInfo']['UserInfo']['id']))
         ue = UserEvent.objects.all().filter(user=u, event=Events[i])
         if len(ue) != 0:
-            if (ue.view):
+            if (ue[0].view):
                 E[i]['Name']=str(Events[i].name)
                 E[i]['Map']={
                     'locLong':Events[i].locLong,
@@ -60,9 +60,9 @@ def activeEvents(request):
                 }
                 E[i]['CreatorID']=Events[i].Creator.id
                 E[i]['id']=Events[i].id
-                E[i]['show']=Events[i].show
+                E[i]['show']=ue[0].view
             else:
-                E[i]['show']=Events[i].show
+                E[i]['show']=ue[0].view
         else:
             E[i]['Name']=str(Events[i].name)
             E[i]['Map']={
@@ -71,8 +71,7 @@ def activeEvents(request):
             }
             E[i]['CreatorID']=Events[i].Creator.id
             E[i]['id']=Events[i].id
-            E[i]['show']=Events[i].show
-    evs = {
+        evs = {
         'ev':E,
     }
     return JsonResponse(evs)
@@ -90,6 +89,11 @@ def EventView(request):
         Event = events.objects.get(id=request.GET.get("evID"))
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Event)
+        if ue:
+            if ue[0] == 1:
+                at = True
+        else:
+            at = False
         res = {
             'Name':Event.name,
             'description':Event.description,
@@ -106,7 +110,7 @@ def EventView(request):
             'timeFrom':Event.timeFrom,
             'timeTo':Event.timeTo,
             'placeNum':Event.placeNum,
-            'attending':ue.stat,
+            'attending':at,
             #EventTypes!!!
         }
         return HttpResponse(template.render(res, request))

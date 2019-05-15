@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wsgi.application'
+WSGI_APPLICATION = 'Eventak.wsgi.application'
 
 
 # Database
@@ -143,6 +143,5 @@ REST_FRAMEWORK = {
     ]
 }
 
-SESSION_COOKIE_SECURE=True
 SESSION_COOKIE_HTTPONLY=True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')

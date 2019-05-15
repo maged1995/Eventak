@@ -162,7 +162,7 @@
         type: 'GET',
         success: function(result) {
           for(var i = 0; i<result['ev'].length; i++){
-            if(result['ev'][i]['show']){
+            if(!result['ev'][i]['show']||result['ev'][i]['view']==true){
               var myLatLng = {
                 "lat": Number(result['ev'][i]['Map']['locLat']),
                 "lng": Number(result['ev'][i]['Map']['locLong'])
