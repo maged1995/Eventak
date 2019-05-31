@@ -52,7 +52,7 @@ def activeEvents(request):
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Events[i])
         if len(ue) != 0:
-            if (ue.view):
+            if (ue[0].view=='True'):
                 E[i]['Name']=str(Events[i].name)
                 E[i]['Map']={
                     'locLong':Events[i].locLong,
@@ -60,9 +60,9 @@ def activeEvents(request):
                 }
                 E[i]['CreatorID']=Events[i].Creator.id
                 E[i]['id']=Events[i].id
-                E[i]['show']=Events[i].show
+                E[i]['show']='true'
             else:
-                E[i]['show']=Events[i].show
+                E[i]['show']='false'
         else:
             E[i]['Name']=str(Events[i].name)
             E[i]['Map']={
@@ -71,25 +71,30 @@ def activeEvents(request):
             }
             E[i]['CreatorID']=Events[i].Creator.id
             E[i]['id']=Events[i].id
-            E[i]['show']=Events[i].show
+            E[i]['show']='true'
     evs = {
         'ev':E,
     }
     return JsonResponse(evs)
 
-def EventView(request):
+def EventHide(request, event):
     if request.method == 'DELETE':
-        Event = events.objects.get(id=request.DELETE.get("evID"))
+        Event = events.objects.get(id=event)
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Event)
-        ue.view = False
-        ue.save()
+        ue[0].view = False
+        ue[0].save()
         return JsonResponse({'Hiding':'Success'})
-    else:
+
+def EventView(request):
+    if request.method == 'GET':
         template = loader.get_template("EventView.html")
         Event = events.objects.get(id=request.GET.get("evID"))
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ue = UserEvent.objects.all().filter(user=u, event=Event)
+        stat = ''
+        if ue:
+            stat = ue[0].stat
         res = {
             'Name':Event.name,
             'description':Event.description,
@@ -106,7 +111,7 @@ def EventView(request):
             'timeFrom':Event.timeFrom,
             'timeTo':Event.timeTo,
             'placeNum':Event.placeNum,
-            'attending':ue.stat,
+            'attending':stat,
             #EventTypes!!!
         }
         return HttpResponse(template.render(res, request))

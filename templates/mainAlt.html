@@ -162,7 +162,7 @@
         type: 'GET',
         success: function(result) {
           for(var i = 0; i<result['ev'].length; i++){
-            if(!result['ev'][i]['view']||result['ev'][i]['show']==true){
+            if(result['ev'][i]['show']=='true'){
               var myLatLng = {
                 "lat": Number(result['ev'][i]['Map']['locLat']),
                 "lng": Number(result['ev'][i]['Map']['locLong'])
@@ -215,11 +215,8 @@
 
     function hide(id){
       $.ajax({
-          url: '/EventView/',
+          url: '/EventHide/'+id+'/',
           type: 'DELETE',
-          data: {
-            'evID':id,
-          },
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
             console.log(result);
