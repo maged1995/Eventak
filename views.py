@@ -142,16 +142,12 @@ def login(request):
                 print(request.session['UserInfo'])
                 return redirect('/', res)
             else:
-                res = {
-                    'login':'fail'
-                }
-                template = loader.get_template("Login.html")
-                return redirect("/login/")
+                return JsonResponse({'login':'fail'})
             print(res)
             #return JsonResponse(res)
         else:
             template = loader.get_template("Login.html")
-            return redirect("/login/")
+            return JsonResponse({'login':'fail'})
 
     elif request.method == 'GET':
         if(request.session['UserInfo']!=''):
@@ -445,8 +441,11 @@ def requestFriendship(request):
 def displayArtists(request):
     template = loader.get_template('artist.html')
     u = Users.objects.all().filter(verified=True)
+    A = [{} for _ in range(len(u))]
+    for i in range(0,len(u)):
+        A[i]['name']=u.displayName,
+        A[i]['picture']=u.profilePic,
     res= {
-        'name':u.displayName,
-        'picture':u.profilePic,
+        'Artists':A
     }
     return HttpResponse(template.render(res, request))

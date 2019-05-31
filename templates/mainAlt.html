@@ -281,6 +281,25 @@
       }
     }
 
+    function login(){
+      $.ajax({
+          url: '/EventCreate/'/*+ $(this).parent().attr('id')*/,
+          data: {
+            'username':$('.username').val(),
+            'password':$('.password').val(),
+          },
+          type: 'POST',
+          success: function(result) {
+            if(result['login']=='fail'){
+              alert("wrong username or Password");
+            }
+            else{
+              redirect("/");
+            }
+          }
+        });
+    }
+
     function createEv(lng,lat,mark){
       $.ajax({
           url: '/EventCreate/'/*+ $(this).parent().attr('id')*/,
