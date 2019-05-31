@@ -26,7 +26,7 @@ SECRET_KEY = '#r!oj!mfty&2zp+c)7t(s)h)wpufcg3*w#(efj_=eyd44=-l52'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk','35.246.135.62']
+ALLOWED_HOSTS = ['eventak.tk','www.eventak.tk','35.246.135.62','35.239.139.145']
 
 
 # Application definition
@@ -126,7 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
-STATIC_ROOT = '/var/www/html/Eventak/Evetak/static/'
+STATIC_ROOT = '/var/www/html/Eventak/Eventak/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
