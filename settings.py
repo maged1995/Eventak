@@ -143,6 +143,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-
-SESSION_COOKIE_HTTPONLY=True
+CSRF_USE_SESSIONS=False
+SESSION_COOKIE_HTTPONLY=False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')

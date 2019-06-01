@@ -9,6 +9,7 @@
       <div class="col-md-2 bg-light" onclick="OpenCloseMap()" style="opacity: 0.0"></div>
       <div class="col-md-8 bg-secondary main" height="100%">
         <div class="col-md-1"></div>
+        {% csrf_token %}
         <div class="col-md-12 bg-secondary" id="loadbasic">
 
         </div>
@@ -18,6 +19,7 @@
 		</div>
 	</body>
   <script>
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var map, infoWindow, markerInd=1, activeEventsMarkers = [];
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
@@ -283,18 +285,22 @@
 
     function login(){
       $.ajax({
-          url: '/EventCreate/'/*+ $(this).parent().attr('id')*/,
+          url: '/login/',
           data: {
             'username':$('.username').val(),
             'password':$('.password').val(),
           },
           type: 'POST',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
-            if(result['login']=='fail'){
+            alert(result['login']);
+	    if(result['login']=='fail'){
               alert("wrong username or Password");
             }
             else{
-              redirect("/");
+              setTimeout(function(){
+               window.location.reload(1);
+            }, 500);
             }
           }
         });
