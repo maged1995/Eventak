@@ -8,7 +8,7 @@ class Users(models.Model):
     username = models.CharField(max_length=24, unique=True, null=False, blank=False)
     displayName = models.CharField(max_length=16, unique=True, null=False, blank=False)
     passwordHash = models.CharField(max_length=86, null=False, blank=False)
-    profilePic = models.TextField()
+    profilePic = models.ImageField(upload_to='ProfilePic%Y%m%d/')
     birthDate = models.DateField()
     phoneNumber = models.TextField()
     dayCreated = models.DateTimeField(null=True, blank=True)
@@ -19,6 +19,12 @@ class Users(models.Model):
 
     def verify_password(self, password):
         return pwd_context.verify(password, self.passwordHash)
+
+class PicUploads(models.Model):
+    profilePic = models.ImageField(upload_to='uploads/%Y%m%d/')
+    dayUploaded = models.DateTimeField(null=True, blank=True)
+    users = models.ManyToManyField('Users')
+    event = models.ForeignKey('events', on_delete=models.CASCADE)
 
 class RelStat(models.Model):
     f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE)  #from

@@ -406,15 +406,13 @@ def CancelRes(request, event):
 
 def findUser(request):
     if request.method == 'GET':
-        users = Users.objects.all().filter(displayName = request.GET.get('nameR'))
-        CurUser = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        relation = RelStat.objects.all().filter(f1id=CurUser)
+        users = Users.objects.raw("SELECT * FROM Eventak_RelStat WHERE stat >= 0 RIGHT JOIN SELECT * FROM Users WHERE name LIKE '%"+request.GET.get('nameR')+"'%")
         print(relation)
         #relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         res = {'Found':'True',}
         if(users):
             for i in range(0,len(users)):
-                if users[i].stat!=-1:
+                if users[i].stat!<0:
                     res['Users'][i]['id'] = users[i].id
                     res['Users'][i]['email'] = users[i].email
                     res['Users'][i]['username'] = users[i].username
@@ -428,7 +426,7 @@ def requestFriendship(request):
         ru = Users.objects.all().filter(username = request.POST.get('usernameR'))
         relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         if(relation):
-            if relation[0].stat==-1 or r==relation[0].stat==3:
+            if relation[0].stat<=-1 or r==relation[0].stat==3:
                 return redirect("/")
             else:
                 newRel = RelStat(f1id=ru, f2id=u, stat = 2)
@@ -444,8 +442,8 @@ def displayArtists(request):
     u = Users.objects.all().filter(verified=True)
     A = [{} for _ in range(len(u))]
     for i in range(0,len(u)):
-        A[i]['name']=u[i].displayName
-        A[i]['picture']=u[i].profilePic
+        A[i]['name']=u[i].displayName,
+        A[i]['picture']=u[i].profilePic,
     res= {
         'Artists':A
     }
