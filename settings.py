@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -131,10 +132,13 @@ STATIC_ROOT = '/var/www/html/Eventak/Eventak/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     '/var/www/html/Eventak/static/',
-    '/var/www/html/Eventak/prof_pic/',
 ]
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = '/var/www/html/Eventak/media/'
+
+MEDIA_URL = '/media/'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

@@ -444,8 +444,8 @@ def displayArtists(request):
     u = Users.objects.all().filter(verified=True)
     A = [{} for _ in range(len(u))]
     for i in range(0,len(u)):
-        A[i]['name']=u[i].displayName,
-        A[i]['picture']=u[i].profilePic,
+        A[i]['name']=u[i].displayName
+        A[i]['picture']=u[i].profilePic
     res= {
         'Artists':A
     }

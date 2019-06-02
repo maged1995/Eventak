@@ -425,11 +425,10 @@
           if ($('#loginBut').text() != "Logout"){
             curPage = "/login/";
             $("#loadbasic").load("/login/");
-            var main = document.getElementById("loadbasic");
-            input.addEventListener("keyup", function(event) {
+            var main = document.getElementById("main");
+            main.addEventListener("keyup", function(event) {
               if (event.keyCode === 13) {
-               event.preventDefault();
-               document.getElementById("myBtn").click();
+               login();
               }
             });
           }

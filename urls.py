@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views, Phone, insertItems  #remove InsertItems on full deployment
 from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,4 +49,4 @@ urlpatterns = [
     path('ajax/validate_username/', views.validate_username, name='validate_username'),
     path('ajax/get_Days_Num/', views.GetDaysNum, name='validate_username'),
     path('initDb/', insertItems.init, name='initiate Database'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
