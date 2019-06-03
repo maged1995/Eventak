@@ -12,6 +12,7 @@ from django.template import loader
 from Eventak.models import Users
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from . import namedtuplefetchall
 
 def login(request):
     username = request.GET.get('username')
@@ -100,3 +101,20 @@ def Find(request):
             }
         return JsonResponse(res)
 
+def findUser(request):
+    if request.method == 'GET':
+        with connection.cursor() as cursor:
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=2 AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+           us = namedtuplefetchall(cursor)
+           if(us):
+              usRes = [{} for _ in range(len(us))]
+              res = {'Found':'True',}
+              for i in range(0,len(us)):
+                 usRes[i]['id'] = us[i].id
+                 usRes[i]['email'] = us[i].email
+                 usRes[i]['username'] = us[i].username
+                 usRes[i]['profilePic'] = us[i].profilePic
+                 usRes[i]['name'] = us[i].displayName
+              res['users'] = usRes
+              return JsonResponse({'result':res})
+           return JsonResponse({'user':'none'})

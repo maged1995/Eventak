@@ -42,6 +42,7 @@ urlpatterns = [
     path('PhoneEventGet/', Phone.Find, name= 'PhoneEventGet'),
     path('requestFriendship/', views.Find, name= 'Request Friendship'),
     path('userSearch/', views.findUser, name= 'Search User'),
+    path('userSearchM/', Phone.findUser, name= 'Search User by Phone'),
     path('displayArtists/', views.displayArtists, name= 'Display Artists'),
     path('cancelEv/Ev<int:event>/', views.CancelEv, name= 'Delete Events'),
     path('cancelRes/Ev<int:event>/', views.CancelRes, name= 'Delete Reservations'),

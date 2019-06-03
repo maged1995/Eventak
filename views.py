@@ -417,6 +417,7 @@ def findUser(request):
         with connection.cursor() as cursor:
            cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=2 AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
            us = namedtuplefetchall(cursor)
+           template = loader.get_template('userSearch.html')
            if(us):
               usRes = [{} for _ in range(len(us))]
               res = {'Found':'True',}
@@ -427,15 +428,8 @@ def findUser(request):
                  usRes[i]['profilePic'] = us[i].profilePic
                  usRes[i]['name'] = us[i].displayName
               res['users'] = usRes
-              return JsonResponse({'result':res})
-           return JsonResponse({'user':'none'})
-        #relation = RelStat.object.all().filter(f1id=ru, f2id=u)
-            
-        '''for i in range(0,len(users)):
-            res['Users'][i]['id'] = users[i].id
-            res['Users'][i]['email'] = users[i].email
-            res['Users'][i]['username'] = users[i].username
-            res['Users'][i]['profilePic'] = users[i].profilePic'''
+              return HttpResponse(template.render(res, request))
+           return HttpResponse(template.render({'user':'none'}, request))
 
 def requestFriendship(request):
     if request.method == 'POST':
