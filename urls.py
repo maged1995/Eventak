@@ -41,6 +41,7 @@ urlpatterns = [
     path('ajax/validate_username/', include('rest_framework.urls', namespace='rest_framework')),
     path('PhoneEventGet/', Phone.Find, name= 'PhoneEventGet'),
     path('requestFriendship/', views.Find, name= 'Request Friendship'),
+    path('userSearchPage/', views.findUserPage, name= 'Search User Page'),
     path('userSearch/', views.findUser, name= 'Search User'),
     path('userSearchM/', Phone.findUser, name= 'Search User by Phone'),
     path('displayArtists/', views.displayArtists, name= 'Display Artists'),
