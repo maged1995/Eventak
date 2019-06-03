@@ -293,7 +293,7 @@
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
             alert(result['login']);
-	    if(result['login']=='fail'){
+	          if(result['login']=='fail'){
               alert("wrong username or Password");
             }
             else{
@@ -301,6 +301,20 @@
                window.location.reload(1);
             }, 500);
             }
+          }
+        });
+    }
+
+    function sendFriendReques(id){
+      $.ajax({
+          url: '/requestFriendship/',
+          data: {
+            'idR':id,
+          },
+          type: 'POST',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            alert(result);
           }
         });
     }

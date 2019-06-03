@@ -415,11 +415,7 @@ def CancelRes(request, event):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-<<<<<<< HEAD
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + request.session['UserInfo']['UserInfo']['id'] + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
-=======
            cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
->>>>>>> 2169ec8bb586a9f3f5ab67b98aff04b09b809982
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearch.html')
            if(us):
@@ -438,7 +434,7 @@ def findUser(request):
 def requestFriendship(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        ru = Users.objects.all().filter(username = request.POST.get('usernameR'))
+        ru = Users.objects.get(id = request.POST.get('idR'))
         relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         if(relation):
             if relation[0].stat<=-1 or r==relation[0].stat==3:
