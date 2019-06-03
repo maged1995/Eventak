@@ -185,7 +185,7 @@
                     type: 'GET',
                     data: {'evID': m.evID},
                     success: function(result) {
-  			console.log('in');
+  			              console.log('in');
                       var infowindow = new google.maps.InfoWindow({
                     		content: result,
                   	  });
@@ -302,6 +302,17 @@
             }, 500);
             }
           }
+        });
+    }
+
+    function userSearch(){
+      $.ajax({
+          url: '/userSearch/'/*+ $(this).parent().attr('id')*/,
+          type: 'GET',
+          data: {'nameR': $("#userSearchText").val()},
+          success: function(result) {
+            $("#SResult").html(result);
+          },
         });
     }
 
@@ -426,6 +437,7 @@
           $("#loadbasic").load(curPage);
         }
       });
+
 
       $("#Artists").click(function(){
         if (curPage != "/displayArtists/"){

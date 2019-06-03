@@ -1,19 +1,9 @@
 {% extends "main.html" %}
 {% block content %}
-<div>
-  {% for u in users %}
+<div class="row divider events">
+<input id="userSearchText" type="text" onchange="userSearch()">
 
-  <div>
-    {{u.profilePic}}
-    {{u.name}}
-    {{u.username}}
-    <div class="updateSection">
-      <button type="button" onclick="sendFriendReques({{u.id}})" class="editEv" name="edit">Send Friend Request</button>
-    </div>
-  </div>
-  {% endfor %}
+<div id="SResult"></div>
 
 </div>
-<br/>
-
 {% endblock %}
