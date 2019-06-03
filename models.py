@@ -27,8 +27,8 @@ class PicUploads(models.Model):
     event = models.ForeignKey('events', on_delete=models.CASCADE)
 
 class RelStat(models.Model):
-    f1id = models.ForeignKey('Users', related_name= 'p1', on_delete=models.CASCADE)  #from
-    f2id = models.ManyToManyField('Users')  #to
+    f1id = models.ForeignKey('Users', related_name= 'f', on_delete=models.CASCADE)  #from
+    f2id = models.ForeignKey('Users', related_name= 't', on_delete=models.CASCADE)  #to
     stat = models.IntegerField(null=False, blank=False)
     time = models.DateTimeField()
 

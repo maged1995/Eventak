@@ -4,6 +4,14 @@ from django.template import loader
 from Eventak.models import events, Users, Reservations, EventTypes, UserEvent
 from .forms import datetimeform
 import random, string, django
+from django.db import connection
+from collections import namedtuple
+
+def namedtuplefetchall(cursor):
+    "Return all rows from a cursor as a namedtuple"
+    desc = cursor.description
+    nt_result = namedtuple('Result', [col[0] for col in desc])
+    return [nt_result(*row) for row in cursor.fetchall()]
 
 def index(request):
     template = loader.get_template('index.html')
@@ -406,19 +414,28 @@ def CancelRes(request, event):
 
 def findUser(request):
     if request.method == 'GET':
-        users = Users.objects.raw("SELECT * FROM Eventak_RelStat WHERE stat >= 0 RIGHT JOIN SELECT * FROM Users WHERE name LIKE '%"+request.GET.get('nameR')+"'%")
-        print(relation)
+        with connection.cursor() as cursor:
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=2 AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+           us = namedtuplefetchall(cursor)
+           if(us):
+              usRes = [{} for _ in range(len(us))]
+              res = {'Found':'True',}
+              for i in range(0,len(us)):
+                 usRes[i]['id'] = us[i].id
+                 usRes[i]['email'] = us[i].email
+                 usRes[i]['username'] = us[i].username
+                 usRes[i]['profilePic'] = us[i].profilePic
+                 usRes[i]['name'] = us[i].displayName
+              res['users'] = usRes
+              return JsonResponse({'result':res})
+           return JsonResponse({'user':'none'})
         #relation = RelStat.object.all().filter(f1id=ru, f2id=u)
-        res = {'Found':'True',}
-        if(users):
-            for i in range(0,len(users)):
-                if users[i].stat!<0:
-                    res['Users'][i]['id'] = users[i].id
-                    res['Users'][i]['email'] = users[i].email
-                    res['Users'][i]['username'] = users[i].username
-                    res['Users'][i]['profilePic'] = users[i].profilePic
-        template = loader.get_template('userSearch.html')
-        return HttpResponse(template.render(res, request))
+            
+        '''for i in range(0,len(users)):
+            res['Users'][i]['id'] = users[i].id
+            res['Users'][i]['email'] = users[i].email
+            res['Users'][i]['username'] = users[i].username
+            res['Users'][i]['profilePic'] = users[i].profilePic'''
 
 def requestFriendship(request):
     if request.method == 'POST':

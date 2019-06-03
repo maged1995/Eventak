@@ -34,13 +34,10 @@ def init(request):
     u2.save()
 
     R.save()
-
     u = Users.objects.get(id=1)
     u2 = Users.objects.get(id=2)
 
-    re = RelStat(f1id = u, stat=3, time=django.utils.timezone.now())
-    re.save()
-    re.f2id.add(u2)
+    re = RelStat(f1id = u, f2id = u2, stat=3, time=django.utils.timezone.now())
     re.save()
 
     return redirect("/")
