@@ -141,7 +141,7 @@ def login(request):
                     'UserInfo':{
                         'username':us.username,
                         'email':us.email,
-                        'profilePic':us.profilePic,
+                        #'profilePic':us.profilePic,
                         'id':us.id,
                         #'birthDate':us.birthDate
                     }
@@ -415,7 +415,11 @@ def CancelRes(request, event):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
+<<<<<<< HEAD
            cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + request.session['UserInfo']['UserInfo']['id'] + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+=======
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+>>>>>>> 2169ec8bb586a9f3f5ab67b98aff04b09b809982
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearch.html')
            if(us):
