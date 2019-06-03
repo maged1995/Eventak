@@ -446,6 +446,13 @@
         }
       });
 
+      $("#userSearch").click(function(){
+        if (curPage != "/userSearch/"){
+          curPage = "/userSearch/";
+          $("#loadbasic").load(curPage);
+        }
+      });
+
       $("#login").click(function(){
         if (curPage != "/login/"){
           if ($('#loginBut').text() != "Logout"){

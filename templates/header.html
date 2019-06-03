@@ -19,6 +19,9 @@
 		<li class="nav-item">
 			{% if request.session.UserInfo != "" %}<a class="nav-link title" id="Artists"><label><strong>Artists</strong></label></a>{% endif %}
 		</li>
+		<li class="nav-item">
+			{% if request.session.UserInfo != "" %}<a class="nav-link title" id="userSearch"><label><strong>Search for a Friend</strong></label></a>{% endif %}
+		</li>
 	</div>
 	<div class="navbar-nav col-md-1  justify-content-left col-sm-3 col-3">
 		<a id="login"><button id="loginBut" class="btn btn-success">{% if request.session.UserInfo == "" %}Login{% else %}Logout{% endif %}</button></a>

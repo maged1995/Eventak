@@ -412,6 +412,9 @@ def CancelRes(request, event):
         print(event)
         return JsonResponse({'request':str(res[0].event.id)})
 
+def findUserPage(request):
+    return HttpResponse(template.render({'load':'Success'}, request))
+
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
