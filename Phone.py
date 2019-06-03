@@ -12,7 +12,8 @@ from django.template import loader
 from Eventak.models import Users
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from . import namedtuplefetchall
+from django.db import connection
+from . import views
 
 def login(request):
     username = request.GET.get('username')
@@ -104,8 +105,8 @@ def Find(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=2 AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
-           us = namedtuplefetchall(cursor)
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + request.session['UserInfo']['UserInfo']['id'] + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+           us = views.namedtuplefetchall(cursor)
            if(us):
               usRes = [{} for _ in range(len(us))]
               res = {'Found':'True',}
@@ -118,3 +119,20 @@ def findUser(request):
               res['users'] = usRes
               return JsonResponse({'result':res})
            return JsonResponse({'user':'none'})
+
+def requestFriendship(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ru = Users.objects.all().filter(username = request.GET.get('usernameR'))
+        relation = RelStat.object.all().filter(f1id=ru, f2id=u)
+        if(relation):
+            if relation[0].stat<=-1 or r==relation[0].stat==3:
+                return redirect("/")
+            else:
+                newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+                newRel.save()
+                return JsonResponse({'request':'success'})
+        else:
+            newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+            newRel.save()
+            return JsonResponse({'request':'success'})
