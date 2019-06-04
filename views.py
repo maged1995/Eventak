@@ -419,7 +419,7 @@ def findUserPage(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) GROUP BY us.id,stat,f1id_id,f2id_id""")
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0 AND ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id""")
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearchRes.html')
            if(us):
@@ -438,11 +438,13 @@ def findUser(request):
 
 def requestFriendship(request):
     if request.method == 'POST':
+        if str(request.session['UserInfo']['UserInfo']['id']) == str(request.POST.get('idR')):
+            return JsonResponse({'request':'fail'})
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
         relation = RelStat.objects.all().filter(f1id=ru, f2id=u)
         if(relation):
-            if relation[0].stat<=-1 or relation[0].stat==5:
+            if relation[0].stat<=-1 or relation[0].stat>=2:
                 return JsonResponse({'request':'fail'})
             else:
                 newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())

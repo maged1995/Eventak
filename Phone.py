@@ -28,7 +28,7 @@ def login(request):
                     'UserInfo':{
                         'username':us.username,
                         'email':'',
-                        'profilePic':us.profilePic,
+                        ###'profilePic':us.profilePic,
                         #'birthDate':us.birthDate
                     }
                 }
