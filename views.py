@@ -1,7 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
-from Eventak.models import events, Users, Reservations, EventTypes, UserEvent
+from Eventak.models import events, Users, Reservations, EventTypes, UserEvent, RelStat
 from .forms import datetimeform
 import random, string, django
 from django.db import connection
@@ -413,12 +413,13 @@ def CancelRes(request, event):
         return JsonResponse({'request':str(res[0].event.id)})
 
 def findUserPage(request):
+    template = loader.get_template('userSearch.html')
     return HttpResponse(template.render({'load':'Success'}, request))
 
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) GROUP BY us.id,stat,f1id_id,f2id_id""")
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearchRes.html')
            if(us):
@@ -430,6 +431,7 @@ def findUser(request):
                  usRes[i]['username'] = us[i].username
                  usRes[i]['profilePic'] = us[i].profilePic
                  usRes[i]['name'] = us[i].displayName
+                 usRes[i]['stat'] = us[i].stat
               res['users'] = usRes
               return HttpResponse(template.render(res, request))
            return HttpResponse(template.render({'user':'none'}, request))
@@ -438,17 +440,21 @@ def requestFriendship(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        relation = RelStat.object.all().filter(f1id=ru, f2id=u)
+        relation = RelStat.objects.all().filter(f1id=ru, f2id=u)
         if(relation):
-            if relation[0].stat<=-1 or r==relation[0].stat==3:
-                return redirect("/")
+            if relation[0].stat<=-1 or relation[0].stat==5:
+                return JsonResponse({'request':'fail'})
             else:
-                newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+                newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())
                 newRel.save()
+                newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+                newRel2.save()
                 return JsonResponse({'request':'success'})
         else:
-            newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+            newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())
             newRel.save()
+            newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+            newRel2.save()
             return JsonResponse({'request':'success'})
 
 def displayArtists(request):

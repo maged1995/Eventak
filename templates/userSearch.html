@@ -1,9 +1,9 @@
 {% extends "main.html" %}
 {% block content %}
-<div class="row divider events">
-<input id="userSearchText" type="text" onchange="userSearch()">
-
-<div id="SResult"></div>
+<div class="row divider events" style="padding-top:25px">
+<input id="userSearchText" type="text" onkeydown="userSearch()"><br/>
 
 </div>
+<div id="SResult"></div>
+
 {% endblock %}

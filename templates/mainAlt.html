@@ -306,14 +306,18 @@
     }
 
     function userSearch(){
-      $.ajax({
-          url: '/userSearch/'/*+ $(this).parent().attr('id')*/,
-          type: 'GET',
-          data: {'nameR': $("#userSearchText").val()},
-          success: function(result) {
-            $("#SResult").html(result);
-          },
-        });
+      setTimeout(function(){
+        if ($("#userSearchText").val() != "") {
+          $.ajax({
+              url: '/userSearch/'/*+ $(this).parent().attr('id')*/,
+              type: 'GET',
+              data: {'nameR': $("#userSearchText").val()},
+              success: function(result) {
+                $("#SResult").html(result);
+              },
+            });
+        }
+      }, 100);
     }
 
     function sendFriendReques(id){
@@ -325,7 +329,7 @@
           type: 'POST',
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
-            alert(result);
+            $("#user"+id).html(result['request']);
           }
         });
     }

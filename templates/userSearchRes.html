@@ -7,9 +7,12 @@
     {{u.profilePic}}
     {{u.name}}
     {{u.username}}
-    <div class="updateSection">
-      <button type="button" onclick="sendFriendReques({{u.id}})" class="editEv" name="edit">Send Friend Request</button>
+    {{u.stat}}
+    {% if u.stat is not 5 %}
+    <div id="user{{u.id}}">
+      {% if u.stat is not 3 %}<button type="button" onclick="sendFriendReques({{u.id}})" class="editEv" name="edit">Send Friend Request</button>{% endif %}
     </div>
+    {% endif %}
   </div>
   {% endfor %}
 
