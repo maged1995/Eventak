@@ -1,7 +1,4 @@
-{% extends "main.html" %}
-{% block content %}
-<div>
-  {% for u in users %}
+{% for u in users %}
 
   <div>
     {{u.profilePic}}
@@ -16,9 +13,4 @@
     </div>
     {% endif %}
   </div>
-  {% endfor %}
-
-</div>
-<br/>
-
-{% endblock %}
+{% endfor %}

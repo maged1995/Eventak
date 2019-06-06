@@ -444,7 +444,7 @@ def requestFriendship(request):
         ru = Users.objects.get(id = request.POST.get('idR'))
         relation = RelStat.objects.all().filter(f1id=ru, f2id=u)
         if(relation):
-            if relation[0].stat<=-1 or relation[0].stat>=2:
+            if relation[0].stat<=-1 or relation[0].stat<=2:
                 return JsonResponse({'request':'fail'})
             else:
                 newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())
@@ -470,3 +470,22 @@ def displayArtists(request):
         'Artists':A
     }
     return HttpResponse(template.render(res, request))
+
+def userRequests(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ru = Users.objects.get(id = request.POST.get('idR'))
+        relation = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        if(relation):
+            usRes = [{} for _ in range(len(relation))]
+            for i in range(0,len(relation)):
+                usRes[i]['id'] = us[i].id
+                usRes[i]['email'] = us[i].email
+                usRes[i]['username'] = us[i].username
+                usRes[i]['profilePic'] = us[i].profilePic
+                usRes[i]['name'] = us[i].displayName
+            res = {'requests': usRes}
+        else:
+            res = {'requests': 'none'}
+        template = loader.get_template('userRequests.html')
+        return HttpResponse(template.render(res, request))

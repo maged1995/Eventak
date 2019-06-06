@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+<div>
+  {% for u in users %}
+
+  <div>
+    {{u.profilePic}}
+    {{u.name}}
+    {{u.username}}
+    {{u.stat}}
+    {% if u.stat is not 5 %}
+    <div id="user{{u.id}}">
+      <button type="button" onclick="acceptFriendRequest({{u.id}})" class="editEv" name="edit">Accept Friend Request</button><button type="button" onclick="rejectFriendRequest({{u.id}})" class="editEv" name="edit">Reject</button>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+</div>
+<br/>
+
+{% endblock %}

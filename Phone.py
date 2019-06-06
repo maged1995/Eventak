@@ -105,7 +105,7 @@ def Find(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic" FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id WHERE (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%') AND rel.f2id_id=""" + request.session['UserInfo']['UserInfo']['id'] + """ AND stat >= 0) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))""")
+           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.GET.get('myID')) + """ AND stat >= 0 AND ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id""")
            us = views.namedtuplefetchall(cursor)
            if(us):
               usRes = [{} for _ in range(len(us))]
@@ -116,13 +116,14 @@ def findUser(request):
                  usRes[i]['username'] = us[i].username
                  usRes[i]['profilePic'] = us[i].profilePic
                  usRes[i]['name'] = us[i].displayName
+                 usRes[i]['stat'] = us[i].stat
               res['users'] = usRes
               return JsonResponse({'result':res})
            return JsonResponse({'user':'none'})
 
 def requestFriendship(request):
     if request.method == 'GET':
-        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        u = Users.objects.get(id=str(request.GET.get('myID')))
         ru = Users.objects.all().filter(username = request.GET.get('usernameR'))
         relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         if(relation):
@@ -136,3 +137,22 @@ def requestFriendship(request):
             newRel = RelStat(f1id=ru, f2id=u, stat = 2)
             newRel.save()
             return JsonResponse({'request':'success'})
+
+def userRequests(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=str(request.GET.get('myID')))
+        ru = Users.objects.get(id = request.POST.get('idR'))
+        relation = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        if(relation):
+            usRes = [{} for _ in range(len(relation))]
+            for i in range(0,len(relation)):
+                usRes[i]['id'] = us[i].id
+                usRes[i]['email'] = us[i].email
+                usRes[i]['username'] = us[i].username
+                usRes[i]['profilePic'] = us[i].profilePic
+                usRes[i]['name'] = us[i].displayName
+            res = {'requests': usRes}
+        else:
+            res = {'requests': 'none'}
+        template = loader.get_template('userRequests.html')
+        return HttpResponse(template.render(res, request))
