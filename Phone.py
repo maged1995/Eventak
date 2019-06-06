@@ -141,8 +141,7 @@ def requestFriendship(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        ru = Users.objects.get(id = request.POST.get('idR'))
-        relation = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        relation = RelStat.objects.all().filter(f1id=u, stat=3)
         if(relation):
             usRes = [{} for _ in range(len(relation))]
             for i in range(0,len(relation)):

@@ -474,16 +474,15 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        ru = Users.objects.get(id = request.POST.get('idR'))
-        relation = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
-        if(relation):
-            usRes = [{} for _ in range(len(relation))]
-            for i in range(0,len(relation)):
-                usRes[i]['id'] = us[i].id
-                usRes[i]['email'] = us[i].email
-                usRes[i]['username'] = us[i].username
-                usRes[i]['profilePic'] = us[i].profilePic
-                usRes[i]['name'] = us[i].displayName
+        rel = RelStat.objects.all().filter(f1id=u, stat=3)
+        if(rel):
+            usRes = [{} for _ in range(len(rel))]
+            for i in range(0,len(rel)):
+                usRes[i]['id'] = rel[i].f2id.id
+                usRes[i]['email'] = rel[i].f2id.email
+                usRes[i]['username'] = rel[i].f2id.username
+                usRes[i]['profilePic'] = rel[i].f2id.profilePic
+                usRes[i]['name'] = rel[i].f2id.displayName
             res = {'requests': usRes}
         else:
             res = {'requests': 'none'}
