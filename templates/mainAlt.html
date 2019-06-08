@@ -320,9 +320,37 @@
       }, 100);
     }
 
-    function sendFriendRequest(id){
+    function acceptFriendRequest(id){
       $.ajax({
-          url: '/requestFriendship/',
+          url: '/acceptFriendRequest/',
+          data: {
+            'idR':id,
+          },
+          type: 'POST',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            $("#user"+id).html(result['request']);
+          }
+        });
+    }
+
+    function hideFriendRequest(id){
+      $.ajax({
+          url: '/hideFriendRequest/',
+          data: {
+            'idR':id,
+          },
+          type: 'POST',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            $("#user"+id).html(result['request']);
+          }
+        });
+    }
+
+    function hideFriendRequest(id){
+      $.ajax({
+          url: '/hideFriendRequest/',
           data: {
             'idR':id,
           },

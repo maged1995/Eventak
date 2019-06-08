@@ -15,11 +15,6 @@ def namedtuplefetchall(cursor):
 
 def index(request):
     template = loader.get_template('index.html')
-    if not 'UserInfo' in request.session:
-        request.session['UserInfo']=''
-    if not 'state' in request.session:
-        state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
-        request.session['state']=state
     Events = {
                 "Events":[{"name":"Amr Diab",
                       "Location":"Cairo festival concert",
@@ -488,3 +483,29 @@ def userRequests(request):
             res = {'requests': 'none'}
         template = loader.get_template('userRequests.html')
         return HttpResponse(template.render(res, request))
+
+def acceptFriendRequest(request):
+    if request.method = 'POST':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ru = Users.objects.get(id = request.POST.get('idR'))
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        if(rel):
+            newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
+            newRel.save()
+            newRel2 = RelStat(f1id=ru, f2id=u, stat = 5, time=django.utils.timezone.now())
+            newRel2.save()
+            return JsonResponse({'request':'success'})
+        else:
+            return JsonResponse({'request':'No Request Receive'})
+
+def hideFriendRequest(request):
+    if request.method = 'POST':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        ru = Users.objects.get(id = request.POST.get('idR'))
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        if(rel):
+            newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
+            newRel.save()
+            return JsonResponse({'request':'success'})
+        else:
+            return JsonResponse({'request':'No Request Receive'})
