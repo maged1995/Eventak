@@ -9,11 +9,12 @@ https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
-from Eventak.models import Users
+from Eventak.models import Users, RelStat
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.db import connection
 from . import views
+import string, django
 
 def login(request):
     username = request.GET.get('username')
@@ -105,7 +106,7 @@ def Find(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.GET.get('myID')) + """ AND stat >= 0 AND ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id""")
+           cursor.execute("""SELECT DISTINCT ON(f2id_id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0 WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY f2id_id,time DESC NULLS LAST""")
            us = views.namedtuplefetchall(cursor)
            if(us):
               usRes = [{} for _ in range(len(us))]
@@ -128,7 +129,7 @@ def requestFriendship(request):
         relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         if(relation):
             if relation[0].stat<=-1 or r==relation[0].stat==3:
-                return redirect("/")
+                return JsonResponse({'request':'success'})
             else:
                 newRel = RelStat(f1id=ru, f2id=u, stat = 2)
                 newRel.save()
@@ -141,16 +142,15 @@ def requestFriendship(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        rel = RelStat.objects.all().filter(f2id=u, stat=3)
+        rel = RelStat.objects.all().filter(f1id=u, stat=3)
         if(rel):
             usRes = [{} for _ in range(len(rel))]
             for i in range(0,len(rel)):
-                ru = Users.objects.get(id=rel[i].id)
-                usRes[i]['id'] = ru.id
-                usRes[i]['email'] = ru.email
-                usRes[i]['username'] = ru.username
-                usRes[i]['profilePic'] = ru.profilePic
-                usRes[i]['name'] = ru.displayName
+                usRes[i]['id'] = rel[i].f2id.id
+                usRes[i]['email'] = rel[i].f2id.email
+                usRes[i]['username'] = rel[i].f2id.username
+                #usRes[i]['profilePic'] = rel[i].f2id.profilePic
+                usRes[i]['name'] = rel[i].f2id.displayName
             res = {'requests': usRes}
         else:
             res = {'requests': 'none'}
@@ -159,25 +159,31 @@ def userRequests(request):
 def acceptFriendRequest(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
+        ru = Users.objects.get(id = request.GET.get('idR'))
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru).order_by('f1id','f2id','-time').distinct('f1id','f2id')
         if(rel):
-            newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
-            newRel.save()
-            newRel2 = RelStat(f1id=ru, f2id=u, stat = 5, time=django.utils.timezone.now())
-            newRel2.save()
-            return JsonResponse({'request':'success'})
+            if(rel[0].stat == 3):
+                newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
+                newRel.save()
+                newRel2 = RelStat(f1id=ru, f2id=u, stat = 5, time=django.utils.timezone.now())
+                newRel2.save()
+                return JsonResponse({'request':'success'})
+            else:
+                return JsonResponse({'request':'failure'})
         else:
             return JsonResponse({'request':'No Request Receive'})
 
 def hideFriendRequest(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
+        ru = Users.objects.get(id = request.GET.get('idR'))
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru).order_by('f1id','f2id','-time').distinct('f1id','f2id')
         if(rel):
-            newRel = RelStat(f1id=ru, f2id=u, stat = -1, time=django.utils.timezone.now())
-            newRel.save()
-            return JsonResponse({'request':'success'})
+            if(rel[0].stat == 3):
+                newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
+                newRel.save()
+                return JsonResponse({'request':'success'})
+            else:
+                return JsonResponse({'request':'failure'})
         else:
             return JsonResponse({'request':'No Request Receive'})

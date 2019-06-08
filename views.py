@@ -414,7 +414,7 @@ def findUserPage(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f1id_id AND rel.f2id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0 AND ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id""")
+           cursor.execute("""SELECT DISTINCT ON(us.id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY us.id,time DESC NULLS LAST""")
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearchRes.html')
            if(us):
@@ -469,7 +469,7 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        rel = RelStat.objects.all().filter(f2id=u, stat=3)
+        rel = RelStat.objects.all().filter(f1id=u, stat=3)
         if(rel):
             usRes = [{} for _ in range(len(rel))]
             for i in range(0,len(rel)):
@@ -477,7 +477,7 @@ def userRequests(request):
                 usRes[i]['id'] = ru.id
                 usRes[i]['email'] = ru.email
                 usRes[i]['username'] = ru.username
-                usRes[i]['profilePic'] = ru.profilePic
+                #usRes[i]['profilePic'] = ru.profilePic
                 usRes[i]['name'] = ru.displayName
             res = {'requests': usRes}
         else:
@@ -489,7 +489,7 @@ def acceptFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
         if(rel):
             newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
             newRel.save()
@@ -503,7 +503,7 @@ def hideFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
+        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
         if(rel):
             newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
             newRel.save()
