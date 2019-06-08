@@ -7,8 +7,8 @@
     {{u.stat}}
     {% if u.stat is not 5 %}
     <div id="user{{u.id}}">
-      {% if u.stat is 2 %}<label>Request already Sent</label>{% endif %}
-      {% if u.stat is 3 %}<button type="button" onclick="acceptFriendRequest({{u.id}})" class="editEv" name="edit">Accept Friend Request</button><button type="button" onclick="hideFriendRequest({{u.id}})" class="editEv" name="edit">Reject</button>
+      {% if u.stat is 2 %}<label>Request already Sent</label>
+      {% elif u.stat is 3 %}<button type="button" onclick="acceptFriendRequest({{u.id}})" class="editEv" name="edit">Accept Friend Request</button><button type="button" onclick="hideFriendRequest({{u.id}})" class="editEv" name="edit">Reject</button>
       {% else %}<button type="button" onclick="sendFriendRequest({{u.id}})" class="editEv" name="edit">Send Friend Request</button>{% endif %}
     </div>
     {% endif %}

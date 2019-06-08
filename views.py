@@ -469,15 +469,16 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        rel = RelStat.objects.all().filter(f1id=u, stat=3)
+        rel = RelStat.objects.all().filter(f2id=u, stat=3)
         if(rel):
             usRes = [{} for _ in range(len(rel))]
             for i in range(0,len(rel)):
-                usRes[i]['id'] = rel[i].f2id.id
-                usRes[i]['email'] = rel[i].f2id.email
-                usRes[i]['username'] = rel[i].f2id.username
-                usRes[i]['profilePic'] = rel[i].f2id.profilePic
-                usRes[i]['name'] = rel[i].f2id.displayName
+                ru = Users.objects.get(id=rel[i].id)
+                usRes[i]['id'] = ru.id
+                usRes[i]['email'] = ru.email
+                usRes[i]['username'] = ru.username
+                usRes[i]['profilePic'] = ru.profilePic
+                usRes[i]['name'] = ru.displayName
             res = {'requests': usRes}
         else:
             res = {'requests': 'none'}
@@ -485,10 +486,10 @@ def userRequests(request):
         return HttpResponse(template.render(res, request))
 
 def acceptFriendRequest(request):
-    if request.method = 'POST':
+    if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
         if(rel):
             newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
             newRel.save()
@@ -499,10 +500,10 @@ def acceptFriendRequest(request):
             return JsonResponse({'request':'No Request Receive'})
 
 def hideFriendRequest(request):
-    if request.method = 'POST':
+    if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
         if(rel):
             newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
             newRel.save()

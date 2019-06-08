@@ -141,26 +141,26 @@ def requestFriendship(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        relation = RelStat.objects.all().filter(f1id=u, stat=3)
-        if(relation):
-            usRes = [{} for _ in range(len(relation))]
-            for i in range(0,len(relation)):
-                usRes[i]['id'] = us[i].id
-                usRes[i]['email'] = us[i].email
-                usRes[i]['username'] = us[i].username
-                usRes[i]['profilePic'] = us[i].profilePic
-                usRes[i]['name'] = us[i].displayName
+        rel = RelStat.objects.all().filter(f2id=u, stat=3)
+        if(rel):
+            usRes = [{} for _ in range(len(rel))]
+            for i in range(0,len(rel)):
+                ru = Users.objects.get(id=rel[i].id)
+                usRes[i]['id'] = ru.id
+                usRes[i]['email'] = ru.email
+                usRes[i]['username'] = ru.username
+                usRes[i]['profilePic'] = ru.profilePic
+                usRes[i]['name'] = ru.displayName
             res = {'requests': usRes}
         else:
             res = {'requests': 'none'}
-        template = loader.get_template('userRequests.html')
-        return HttpResponse(template.render(res, request))
+        return JsonResponse(res)
 
 def acceptFriendRequest(request):
-    if request.method = 'POST':
+    if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
         if(rel):
             newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
             newRel.save()
@@ -171,12 +171,12 @@ def acceptFriendRequest(request):
             return JsonResponse({'request':'No Request Receive'})
 
 def hideFriendRequest(request):
-    if request.method = 'POST':
+    if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(f1id=ru, f2id=u, stat=3)
         if(rel):
-            newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
+            newRel = RelStat(f1id=ru, f2id=u, stat = -1, time=django.utils.timezone.now())
             newRel.save()
             return JsonResponse({'request':'success'})
         else:

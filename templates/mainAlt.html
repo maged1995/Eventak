@@ -348,9 +348,9 @@
         });
     }
 
-    function hideFriendRequest(id){
+    function sendFriendRequest(id){
       $.ajax({
-          url: '/hideFriendRequest/',
+          url: '/requestFriendship/',
           data: {
             'idR':id,
           },
