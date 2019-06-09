@@ -106,7 +106,7 @@ def Find(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT DISTINCT ON(f2id_id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ AND stat >= 0 WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY f2id_id,time DESC NULLS LAST""")
+           cursor.execute("""SELECT DISTINCT ON(f2id_id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.GET.get('myID')) + """ AND stat >= 0 WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY f2id_id,time DESC NULLS LAST""")
            us = views.namedtuplefetchall(cursor)
            if(us):
               usRes = [{} for _ in range(len(us))]
@@ -141,20 +141,22 @@ def requestFriendship(request):
 
 def userRequests(request):
     if request.method == 'GET':
-        u = Users.objects.get(id=str(request.GET.get('myID')))
-        rel = RelStat.objects.all().filter(f1id=u, stat=3)
-        if(rel):
-            usRes = [{} for _ in range(len(rel))]
-            for i in range(0,len(rel)):
-                usRes[i]['id'] = rel[i].f2id.id
-                usRes[i]['email'] = rel[i].f2id.email
-                usRes[i]['username'] = rel[i].f2id.username
-                #usRes[i]['profilePic'] = rel[i].f2id.profilePic
-                usRes[i]['name'] = rel[i].f2id.displayName
-            res = {'requests': usRes}
-        else:
-            res = {'requests': 'none'}
-        return JsonResponse(res)
+        with connection.cursor() as cursor:
+            cursor.execute("""select * from (select DISTINCT ON(f1id_id,f2id_id) * from "Eventak_relstat" where f1id_id = """ +str(request.GET.get('myID'))+ """ GROUP BY id,f1id_id,f2id_id ORDER BY f1id_id,f2id_id,time DESC NULLS LAST) as rel where stat = 3""")
+            rel = views.namedtuplefetchall(cursor)
+            if(rel):
+                usRes = [{} for _ in range(len(rel))]
+                for i in range(0,len(rel)):
+                    u = Users.objects.get(id=rel[i].f2id_id)
+                    usRes[i]['id'] = u.id
+                    usRes[i]['email'] = u.email
+                    usRes[i]['username'] = u.username
+                    #usRes[i]['profilePic'] = u.profilePic
+                    usRes[i]['name'] = u.displayName
+                res = {'requests': usRes}
+            else:
+                res = {'requests': 'none'}
+            return JsonResponse(res)
 
 def acceptFriendRequest(request):
     if request.method == 'GET':
@@ -162,7 +164,7 @@ def acceptFriendRequest(request):
         ru = Users.objects.get(id = request.GET.get('idR'))
         rel = RelStat.objects.all().filter(f1id=u, f2id=ru).order_by('f1id','f2id','-time').distinct('f1id','f2id')
         if(rel):
-            if(rel[0].stat == 3):
+            if(rel[0].stat == 3 or rel[0].stat == -1):
                 newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
                 newRel.save()
                 newRel2 = RelStat(f1id=ru, f2id=u, stat = 5, time=django.utils.timezone.now())
