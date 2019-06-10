@@ -407,6 +407,87 @@ def CancelRes(request, event):
         print(event)
         return JsonResponse({'request':str(res[0].event.id)})
 
+def UserPage(request):
+    u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+    if u:
+        if u.favTypes:
+            EvT = [{} for _ in range(len(u.favTypes))]
+            for i in range(0,len(u.favTypes)):
+                EvT[i]['PrefId'] = u.favTypes[i].id,
+                EvT[i]['PrefName'] = u.favTypes[i].name,
+            res = {
+                'load':'success',
+                'name':u.name,
+                'prefs':EvT,
+            }
+        else:
+            res = {
+                'load':'success',
+                'name':u.name,
+            }
+        template = loader.get_template('userPage.html')
+        return HttpResponse(template.render(res, request))
+    else:
+        template = loader.get_template('userPage.html')
+        return HttpResponse(template.render({'load':'success'}, request))
+
+
+def findPref(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT * FROM "Eventak_eventtypes" where LOWER(name) LIKE LOWER('%"""+request.GET.get('pref')+"""%')""")
+        prefs = namedtuplefetchall(cursor)
+        template = loader.get_template('prefSearch.html')
+        if(prefs):
+            prefsRes = [{} for _ in range(len(prefs))]
+            res = {'Found':'True',}
+            for i in range(0,len(prefs)):
+               prefsRes[i]['id'] = prefs[i].id
+               prefsRes[i]['name'] = prefs[i].name
+            res['prefs'] = prefsRes
+            return HttpResponse(template.render(res, request))
+        else:
+            return HttpResponse(template.render({'found':'none'}, request))
+
+def addPref(request):
+    pref = EventTypes.objects.all().filter(id = request.POST.get('PrefId'))
+    if(pref):
+        us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'], favTypes = pref[0])
+        if(us):
+            return JsonResponse({'request':'already done'})
+        else:
+            us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+            if(us):
+                us.favTypes.add(pref[0])
+                return JsonResponse({'request':'success'})
+            else:
+                return JsonResponse({'request':'not Logged in'})
+    else:
+        return JsonResponse({'request':'Pref not Found'})
+
+def UserPage(request):
+    u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+    if u:
+        if u.favTypes:
+            EvT = [{} for _ in range(len(u.favTypes.all()))]
+            for i in range(0,len(u.favTypes.all())):
+                EvT[i]['id'] = u.favTypes[i].id,
+                EvT[i]['name'] = u.favTypes[i].name,
+            res = {
+                'load':'success',
+                'name':u.displayName,
+                'prefs':EvT,
+            }
+        else:
+            res = {
+                'load':'success',
+                'name':u.name,
+            }
+        template = loader.get_template('UserPage.html')
+        return HttpResponse(template.render(res, request))
+    else:
+        template = loader.get_template('userPage.html')
+        return HttpResponse(template.render({'load':'success'}, request))
+
 def findUserPage(request):
     template = loader.get_template('userSearch.html')
     return HttpResponse(template.render({'load':'Success'}, request))

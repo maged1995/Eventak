@@ -106,7 +106,7 @@ def Find(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT DISTINCT ON(f2id_id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.GET.get('myID')) + """ AND stat >= 0 WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY f2id_id,time DESC NULLS LAST""")
+           cursor.execute("""SELECT DISTINCT ON(f2id_id,us.id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.GET.get('myID')) + """ AND stat >= -1 WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY us.id, f2id_id, time DESC NULLS LAST""")
            us = views.namedtuplefetchall(cursor)
            if(us):
               usRes = [{} for _ in range(len(us))]
@@ -125,7 +125,7 @@ def findUser(request):
 def requestFriendship(request):
     if request.method == 'GET':
         u = Users.objects.get(id=str(request.GET.get('myID')))
-        ru = Users.objects.all().filter(username = request.GET.get('usernameR'))
+        ru = Users.objects.get(id= request.GET.get('idR'))
         relation = RelStat.object.all().filter(f1id=ru, f2id=u)
         if(relation):
             if relation[0].stat<=-1 or r==relation[0].stat==3:

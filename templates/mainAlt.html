@@ -226,6 +226,40 @@
       });
     }
 
+    function searchPreference(){
+      setTimeout(function(){
+        if ($("#userSearchText").val() != "") {
+          $.ajax({
+              url: '/SearchPrefrence/',
+              type: 'GET',
+              data: {
+                'pref':$("#prefField").val(),
+              },
+              headers: {'X-CSRFToken':'{{ csrf_token }}'},
+              success: function(result) {
+                console.log(result);
+                    $("#PrefAvail").html(result);
+              }
+          });
+        }
+      }, 100);
+    }
+
+    function addPreference(id){
+      $.ajax({
+          url: '/addPrefrence/',
+          type: 'POST',
+          data: {
+            'PrefId':id,
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            console.log(result);
+                $("#PrefRes").html(result);
+          }
+      });
+    }
+
     var ClickEventHandler = function(map) {
         this.map = map;
 	this.placesService = new google.maps.places.PlacesService(map);
@@ -481,6 +515,13 @@
       $("#userSearch").click(function(){
         if (curPage != "/userSearchPage/"){
           curPage = "/userSearchPage/";
+          $("#loadbasic").load(curPage);
+        }
+      });
+
+      $("#userPage").click(function(){
+        if (curPage != "/userPage/"){
+          curPage = "/userPage/";
           $("#loadbasic").load(curPage);
         }
       });

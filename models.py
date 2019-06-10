@@ -36,7 +36,6 @@ class RelStat(models.Model):
 class EventTypes(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=15, null=False, blank=False)
-    parent = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
     def __str__(self):
         return self.name
     def findMainParent(self, id):

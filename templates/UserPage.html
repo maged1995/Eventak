@@ -1,4 +1,13 @@
 {% extends "main.html" %}
 {% block content %}
 
+<h1>{{name}}</h1>
+<h3>Preferences:</h3>
+{% for p in prefs %}
+{{p.name}}
+{{p.id}}
+{% endfor %}
+<input type="text" id="prefField" onkeydown="searchPreference()"/>
+<div id="PrefAvail"/></div>
+
 {% endblock %}

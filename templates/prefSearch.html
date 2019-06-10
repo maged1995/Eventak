@@ -1,0 +1,9 @@
+{% extends "main.html" %}
+{% block content %}
+
+{% for p in prefs %}
+{{p.name}}
+<button onClick="addPreference({{p.id}})">Add Preference</button>
+{% endfor %}
+
+{% endblock %}
