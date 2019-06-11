@@ -13,7 +13,6 @@ class Users(models.Model):
     phoneNumber = models.TextField()
     dayCreated = models.DateTimeField(null=True, blank=True)
     verified = models.BooleanField(null=False, blank=False)
-    favTypes = models.ManyToManyField('EventTypes')
 
     def hash_password(self, password):
         self.passwordHash = pwd_context.encrypt(password)
@@ -23,9 +22,9 @@ class Users(models.Model):
 
 class PicUploads(models.Model):
     profilePic = models.ImageField(upload_to='uploads/%Y%m%d/')
-    dayUploaded = models.DateTimeField(null=True, blank=True)
     users = models.ManyToManyField('Users')
     event = models.ForeignKey('events', on_delete=models.CASCADE)
+    time = models.DateTimeField(null=True, blank=True)
 
 class RelStat(models.Model):
     f1id = models.ForeignKey('Users', related_name= 'f', on_delete=models.CASCADE)  #from
@@ -83,6 +82,7 @@ class SubEventTypes(models.Model):
 class UserPref(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)
     etid = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
+    time = models.DateTimeField(null=False, blank=False)
 
 class UserEvent(models.Model):
     id = models.AutoField(primary_key=True)
@@ -90,4 +90,4 @@ class UserEvent(models.Model):
     event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
     stat = models.IntegerField(null=False, blank=False)
     view = models.BooleanField(null=False, blank=False)
-    #time = models.DateTimeField(null=False, blank=False)
+    time = models.DateTimeField(null=False, blank=False)

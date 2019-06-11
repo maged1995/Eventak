@@ -3,11 +3,14 @@
 
 <h1>{{name}}</h1>
 <h3>Preferences:</h3>
+<div id="curPrefs">
 {% for p in prefs %}
 {{p.name}}
-{{p.id}}
+{{p.id}} <br>
 {% endfor %}
+</div>
 <input type="text" id="prefField" onkeydown="searchPreference()"/>
+<button onClick="createPref()"">Add New Preference</button>
 <div id="PrefAvail"/></div>
 
 {% endblock %}

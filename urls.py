@@ -53,6 +53,7 @@ urlpatterns = [
     path('hideFriendRequestM/', Phone.hideFriendRequest, name= 'hide friend Request'),
     path('SearchPrefrence/', views.findPref, name= 'find Preference'),
     path('addPrefrence/', views.addPref, name= 'add Preference'),
+    path('createPrefrence/', views.newPref, name= 'new Preference'),
     path('userPage/', views.UserPage, name= 'User Profile Page'),
     path('displayArtists/', views.displayArtists, name= 'Display Artists'),
     path('cancelEv/Ev<int:event>/', views.CancelEv, name= 'Delete Events'),

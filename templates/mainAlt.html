@@ -226,6 +226,23 @@
       });
     }
 
+    function createPref(){
+      $.ajax({
+          url: '/createPrefrence/',
+          type: 'POST',
+          data: {
+            'Pref':$("#prefField").val(),
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            $("#PrefAvail").html(result['request']);
+            if(result['name'] == 'success'){
+              $("#curPrefs").html($("#curPrefs").html() + result['name'] + " " + result['id'])
+            }
+          }
+      });
+    }
+
     function searchPreference(){
       setTimeout(function(){
         if ($("#userSearchText").val() != "") {
@@ -237,7 +254,6 @@
               },
               headers: {'X-CSRFToken':'{{ csrf_token }}'},
               success: function(result) {
-                console.log(result);
                     $("#PrefAvail").html(result);
               }
           });
@@ -254,8 +270,10 @@
           },
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
-            console.log(result);
-                $("#PrefRes").html(result);
+            $("#PrefAvail").html(result['request']);
+            if(result['name'] == 'success'){
+              $("#curPrefs").html($("#curPrefs").html() + result['name'] + " " + result['id'])
+            }
           }
       });
     }

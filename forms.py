@@ -1,6 +1,7 @@
 import datetime
 
 from django import forms
+from .models import *
 from tempus_dominus.widgets import DatePicker, TimePicker, DateTimePicker
 
 class datetimeform(forms.Form):
@@ -21,7 +22,6 @@ class datetimeform(forms.Form):
             }
         ),
     )
-
     Date_To = forms.DateTimeField(
         widget=DateTimePicker(
             options={
@@ -39,3 +39,13 @@ class datetimeform(forms.Form):
             }
         ),
     )
+
+class UserProfilePic(forms.ModelForm):
+    class Meta:
+        model = Users
+        fields = ['profilePic']
+
+class Uploads(forms.ModelForm):
+    class Meta:
+        model = PicUploads
+        fields = ['profilePic']

@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import loader
 from Eventak.models import events, Users, Reservations, EventTypes, UserEvent, RelStat
-from .forms import datetimeform
+from .forms import *
 import random, string, django
 from django.db import connection
 from collections import namedtuple
@@ -407,30 +407,6 @@ def CancelRes(request, event):
         print(event)
         return JsonResponse({'request':str(res[0].event.id)})
 
-def UserPage(request):
-    u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-    if u:
-        if u.favTypes:
-            EvT = [{} for _ in range(len(u.favTypes))]
-            for i in range(0,len(u.favTypes)):
-                EvT[i]['PrefId'] = u.favTypes[i].id,
-                EvT[i]['PrefName'] = u.favTypes[i].name,
-            res = {
-                'load':'success',
-                'name':u.name,
-                'prefs':EvT,
-            }
-        else:
-            res = {
-                'load':'success',
-                'name':u.name,
-            }
-        template = loader.get_template('userPage.html')
-        return HttpResponse(template.render(res, request))
-    else:
-        template = loader.get_template('userPage.html')
-        return HttpResponse(template.render({'load':'success'}, request))
-
 
 def findPref(request):
     with connection.cursor() as cursor:
@@ -448,39 +424,59 @@ def findPref(request):
         else:
             return HttpResponse(template.render({'found':'none'}, request))
 
-def addPref(request):
-    pref = EventTypes.objects.all().filter(id = request.POST.get('PrefId'))
-    if(pref):
-        us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'], favTypes = pref[0])
-        if(us):
-            return JsonResponse({'request':'already done'})
-        else:
-            us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-            if(us):
-                us.favTypes.add(pref[0])
-                return JsonResponse({'request':'success'})
+def newPref(request):
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM "Eventak_eventtypes" where LOWER(name) LIKE LOWER('%"""+request.POST.get('pref')+"""%')""")
+            ets = namedtuplefetchall(cursor)
+            if(ets):
+                return JsonResponse({'request':'already Exists'})
             else:
-                return JsonResponse({'request':'not Logged in'})
+                newET = EventTypes(name = request.POST.get('pref'))
+                save()
+                us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
+                if(us):
+                    newP = UserPref(uid = us, etid = newET, time =django.utils.timezone.now())
+                    newP.save()
+                    return JsonResponse({'request':'success', 'id':newET.id, 'name':mewET.name})
+
+def addPref(request):
+    us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
+    if(us):
+        et = EventTypes.objects.get(id = request.POST.get('PrefId'))
+        if et:
+            up = UserPref.objects.get(uid = us)
+            if(up):
+                return JsonResponse({'request':'already done'})
+            else:
+                newP = UserPref(uid = us, etid = et, time =django.utils.timezone.now())
+                newP.save()
+                return JsonResponse({'request':'success', 'id':et.id, 'name':et.name})
+        else:
+            return JsonResponse({'request':'Preference not found'})
     else:
-        return JsonResponse({'request':'Pref not Found'})
+        return JsonResponse({'request':'User not Found'})
 
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        if u.favTypes:
-            EvT = [{} for _ in range(len(u.favTypes.all()))]
-            for i in range(0,len(u.favTypes.all())):
-                EvT[i]['id'] = u.favTypes[i].id,
-                EvT[i]['name'] = u.favTypes[i].name,
+        up = UserPref.objects.get(uid = u)
+        if up:
+            EvT = [{} for _ in range(len(up))]
+            for i in range(0,len(up)):
+                EvT[i]['id'] = up[i].id,
+                EvT[i]['name'] = up[i].name,
             res = {
                 'load':'success',
                 'name':u.displayName,
                 'prefs':EvT,
+                'form':UserProfilePic(),
             }
         else:
             res = {
                 'load':'success',
-                'name':u.name,
+                'name':u.displayName,
+                'form':UserProfilePic(),
             }
         template = loader.get_template('UserPage.html')
         return HttpResponse(template.render(res, request))
