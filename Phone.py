@@ -123,20 +123,24 @@ def findUser(request):
            return JsonResponse({'user':'none'})
 
 def requestFriendship(request):
-    if request.method == 'GET':
-        u = Users.objects.get(id=str(request.GET.get('myID')))
+    if request.method == 'GET' and request.GET.get('myID')!=request.GET.get('idR'):
+        u = Users.objects.get(id=request.GET.get('myID'))
         ru = Users.objects.get(id= request.GET.get('idR'))
-        relation = RelStat.object.all().filter(f1id=ru, f2id=u)
+        relation = RelStat.objects.all().filter(f1id=ru, f2id=u).order_by('-time')
         if(relation):
-            if relation[0].stat<=-1 or r==relation[0].stat==3:
-                return JsonResponse({'request':'success'})
+            if relation[0].stat<=-1 or relation[0].stat>1:
+                return JsonResponse({'request':'already done'})
             else:
-                newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+                newRel = RelStat(f1id=u, f2id=ru, stat = 2, time = django.utils.timezone.now())
                 newRel.save()
+                newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+                newRel2.save()
                 return JsonResponse({'request':'success'})
         else:
-            newRel = RelStat(f1id=ru, f2id=u, stat = 2)
+            newRel = RelStat(f1id=u, f2id=ru, stat = 2, time = django.utils.timezone.now())
             newRel.save()
+            newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+            newRel2.save()
             return JsonResponse({'request':'success'})
 
 def userRequests(request):

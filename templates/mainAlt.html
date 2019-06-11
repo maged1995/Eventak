@@ -231,7 +231,7 @@
           url: '/createPrefrence/',
           type: 'POST',
           data: {
-            'Pref':$("#prefField").val(),
+            'pref':$("#prefField").val(),
           },
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
@@ -268,6 +268,26 @@
           data: {
             'PrefId':id,
           },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            $("#PrefAvail").html(result['request']);
+            if(result['name'] == 'success'){
+              $("#curPrefs").html($("#curPrefs").html() +"" + result['name'] + " " + result['id']+"<br/>")
+            }
+          }
+      });
+    }
+
+    function updateProfPic(){
+      $.ajax({
+          url: '/updateProfilePic/',
+          type: 'POST',
+          data: {'img':$("#id_img").val()},
+          async: true,
+          cache: false,
+          contentType: false,
+          enctype: 'multipart/form-data',
+          processData: false,
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
             $("#PrefAvail").html(result['request']);

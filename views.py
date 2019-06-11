@@ -6,6 +6,7 @@ from .forms import *
 import random, string, django
 from django.db import connection
 from collections import namedtuple
+from django.core.files.storage import FileSystemStorage
 
 def namedtuplefetchall(cursor):
     "Return all rows from a cursor as a namedtuple"
@@ -410,7 +411,7 @@ def CancelRes(request, event):
 
 def findPref(request):
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT * FROM "Eventak_eventtypes" where LOWER(name) LIKE LOWER('%"""+request.GET.get('pref')+"""%')""")
+        cursor.execute("""SELECT * FROM "Eventak_eventtypes" where LOWER(name) LIKE LOWER('%"""+str(request.GET.get('pref'))+"""%')""")
         prefs = namedtuplefetchall(cursor)
         template = loader.get_template('prefSearch.html')
         if(prefs):
@@ -433,19 +434,19 @@ def newPref(request):
                 return JsonResponse({'request':'already Exists'})
             else:
                 newET = EventTypes(name = request.POST.get('pref'))
-                save()
+                newET.save()
                 us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
                 if(us):
-                    newP = UserPref(uid = us, etid = newET, time =django.utils.timezone.now())
+                    newP = UserPref(uid = us[0], etid = newET, time =django.utils.timezone.now())
                     newP.save()
-                    return JsonResponse({'request':'success', 'id':newET.id, 'name':mewET.name})
+                    return JsonResponse({'request':'success', 'id':newET.id, 'name':newET.name})
 
 def addPref(request):
-    us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
+    us = Users.objects.get(id=str(request.session['UserInfo']['UserInfo']['id']))
     if(us):
-        et = EventTypes.objects.get(id = request.POST.get('PrefId'))
+        et = EventTypes.objects.get(id =str(request.POST.get('PrefId')))
         if et:
-            up = UserPref.objects.get(uid = us)
+            up = UserPref.objects.all().filter(uid = us, etid=et)
             if(up):
                 return JsonResponse({'request':'already done'})
             else:
@@ -460,12 +461,12 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.get(uid = u)
+        up = UserPref.objects.all().filter(uid = u)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
-                EvT[i]['id'] = up[i].id,
-                EvT[i]['name'] = up[i].name,
+                EvT[i]['id'] = up[i].etid.id
+                EvT[i]['name'] = up[i].etid.name
             res = {
                 'load':'success',
                 'name':u.displayName,
@@ -483,6 +484,17 @@ def UserPage(request):
     else:
         template = loader.get_template('userPage.html')
         return HttpResponse(template.render({'load':'success'}, request))
+
+def updateProfPic(request):
+    if request.method == 'POST':
+        myfile = request.POST.get('img')
+        fs = FileSystemStorage()
+        filename = fs.save('mag.jpg', myfile)
+        uploaded_file_url = fs.uIrl(filename)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['profilePic'])
+            return JsonResponse({'request':'success'})
+    return HttpResponse(_('Invalid request!'))
 
 def findUserPage(request):
     template = loader.get_template('userSearch.html')

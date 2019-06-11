@@ -40,10 +40,8 @@ class datetimeform(forms.Form):
         ),
     )
 
-class UserProfilePic(forms.ModelForm):
-    class Meta:
-        model = Users
-        fields = ['profilePic']
+class UserProfilePic(forms.Form):
+    img = forms.FileField()
 
 class Uploads(forms.ModelForm):
     class Meta:

@@ -55,6 +55,7 @@ urlpatterns = [
     path('addPrefrence/', views.addPref, name= 'add Preference'),
     path('createPrefrence/', views.newPref, name= 'new Preference'),
     path('userPage/', views.UserPage, name= 'User Profile Page'),
+    path('updateProfilePic/', views.updateProfPic, name= 'update Profile Picture'),
     path('displayArtists/', views.displayArtists, name= 'Display Artists'),
     path('cancelEv/Ev<int:event>/', views.CancelEv, name= 'Delete Events'),
     path('cancelRes/Ev<int:event>/', views.CancelRes, name= 'Delete Reservations'),
