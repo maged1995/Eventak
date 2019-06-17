@@ -53,18 +53,21 @@ def activeEvents(request):
     Events = events.objects.all()
     E = [{} for _ in range(len(Events))]
     for i in range(0,len(Events)):
-        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        ue = UserEvent.objects.all().filter(user=u, event=Events[i])
-        if len(ue) != 0:
-            if (ue[0].view=='True'):
-                E[i]['Name']=str(Events[i].name)
-                E[i]['Map']={
-                    'locLong':Events[i].locLong,
-                    'locLat':Events[i].locLat
-                }
-                E[i]['CreatorID']=Events[i].Creator.id
-                E[i]['id']=Events[i].id
-                E[i]['show']='true'
+        if request.session['UserInfo'] != '':
+            u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+            ue = UserEvent.objects.all().filter(user=u, event=Events[i])
+            if ue:
+                stat = ue[0].stat
+                if len(ue) != 0:
+                    if (ue[0].view==True):
+                        E[i]['Name']=str(Events[i].name)
+                        E[i]['Map']={
+                            'locLong':Events[i].locLong,
+                            'locLat':Events[i].locLat
+                        }
+                        E[i]['CreatorID']=Events[i].Creator.id
+                        E[i]['id']=Events[i].id
+                        E[i]['show']='true'
             else:
                 E[i]['show']='false'
         else:
@@ -94,11 +97,12 @@ def EventView(request):
     if request.method == 'GET':
         template = loader.get_template("EventView.html")
         Event = events.objects.get(id=request.GET.get("evID"))
-        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        ue = UserEvent.objects.all().filter(user=u, event=Event)
         stat = ''
-        if ue:
-            stat = ue[0].stat
+        if request.session['UserInfo']:
+            u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+            ue = UserEvent.objects.all().filter(user=u, event=Event)
+            if ue:
+                stat = ue[0].stat
         res = {
             'Name':Event.name,
             'description':Event.description,
@@ -137,6 +141,7 @@ def login(request):
                     'UserInfo':{
                         'username':us.username,
                         'email':us.email,
+                        'displayName':us.displayName,
                         #'profilePic':us.profilePic,
                         'id':us.id,
                         #'birthDate':us.birthDate
@@ -176,11 +181,24 @@ def Signup(request):
             '''VALIDATE PHONENUMBER IS ALL NUMBERS
             VALIDATE DAYS IN MONTH'''
         else:
-            u = Users(birthDate="1995-06-21",
-                      username = request.POST.get("username"),
+            u = Users(birthDate=request.POST.get("Year")+"-"+ request.POST.get("Month") +"-" + request.POST.get("Day"), 
+                      displayName = request.POST.get("displayName"),
+                      username = request.POST.get("username"), dayCreated = django.utils.timezone.now(),
                       email = request.POST.get("email"), verified=True)
-            u.hash_password("Leila")
+            u.hash_password(request.POST.get("password"))
             u.save()
+            res={
+                'login':'success',
+                'UserInfo':{
+                    'username':u.username,
+                    'email':u.email,
+                    #'profilePic':us.profilePic,
+                    'id':u.id,
+                    #'birthDate':us.birthDate
+                }
+            }
+            request.session['UserInfo'] = res
+            return redirect("/")
     if request.method == "GET":
         template = loader.get_template("Signup.html")
         context = {
@@ -226,7 +244,7 @@ def attend(request):
         e = events.objects.get(id=request.POST.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not len(ue)>0:
-            newGo = UserEvent(user=u, event=e, stat=1, view=True)
+            newGo = UserEvent(user=u, event=e, stat=1, view=True, time = django.utils.timezone.now())
             newGo.save()
             return JsonResponse({'Attend': 'success'})
         return JsonResponse({'Attend': 'Failure'})
@@ -329,7 +347,7 @@ def map(request):
     return HttpResponse(template.render(context, request))
 
 def displayMyEvents(request):
-    us = Users.objects.get(id=1)  #request.session['User']["UserInfo"]["username"])
+    us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])  #request.session['User']["UserInfo"]["username"])
     Events = events.objects.all().filter(Creator=us)
     if(Events):
         print("pass")
@@ -425,6 +443,22 @@ def findPref(request):
         else:
             return HttpResponse(template.render({'found':'none'}, request))
 
+def findPrefEV(request):
+    with connection.cursor() as cursor:
+        cursor.execute("""SELECT * FROM "Eventak_eventtypes" where LOWER(name) LIKE LOWER('%"""+str(request.GET.get('pref'))+"""%')""")
+        prefs = namedtuplefetchall(cursor)
+        template = loader.get_template('prefSearchEV.html')
+        if(prefs):
+            prefsRes = [{} for _ in range(len(prefs))]
+            res = {'Found':'True',}
+            for i in range(0,len(prefs)):
+               prefsRes[i]['id'] = prefs[i].id
+               prefsRes[i]['name'] = prefs[i].name
+            res['prefs'] = prefsRes
+            return HttpResponse(template.render(res, request))
+        else:
+            return HttpResponse(template.render({'found':'none'}, request))
+
 def newPref(request):
     if request.method == 'POST':
         with connection.cursor() as cursor:
@@ -437,7 +471,7 @@ def newPref(request):
                 newET.save()
                 us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
                 if(us):
-                    newP = UserPref(uid = us[0], etid = newET, time =django.utils.timezone.now())
+                    newP = UserPref(uid = us[0], etid = newET, isPref=True, time =django.utils.timezone.now())
                     newP.save()
                     return JsonResponse({'request':'success', 'id':newET.id, 'name':newET.name})
 
@@ -446,11 +480,11 @@ def addPref(request):
     if(us):
         et = EventTypes.objects.get(id =str(request.POST.get('PrefId')))
         if et:
-            up = UserPref.objects.all().filter(uid = us, etid=et)
+            up = UserPref.objects.all().filter(uid = us, etid=et, isPref=True)
             if(up):
                 return JsonResponse({'request':'already done'})
             else:
-                newP = UserPref(uid = us, etid = et, time =django.utils.timezone.now())
+                newP = UserPref(uid = us, etid = et, isPref=True, time =django.utils.timezone.now())
                 newP.save()
                 return JsonResponse({'request':'success', 'id':et.id, 'name':et.name})
         else:
@@ -461,7 +495,7 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.all().filter(uid = u)
+        up = UserPref.objects.all().filter(uid = ui, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
@@ -599,3 +633,18 @@ def hideFriendRequest(request):
             return JsonResponse({'request':'success'})
         else:
             return JsonResponse({'request':'No Request Receive'})
+
+def calcDay(date):
+    d = date.split('-')
+    day = int(int(d[2])+7)%31
+    if(d[1]=='12'):
+        if(day < 10):
+            return (str(int(d[0])+1)+ '-01-0' + str(day))
+    elif (day < 7):
+        if (int(d[1])+1 < 10):
+            return d[0]+'-0'+str(int(d[1])+1)+'-0'+ str(day)
+        else:
+            return d[0]+'-'+str(int(d[1])+1)+'-0'+ str(day)
+    elif (day < 10):
+        return d[0]+'-'+d[1]+'-0'+ str(day)
+    return d[0]+'-'+d[1]+'-'+ str(day)

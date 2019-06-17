@@ -245,7 +245,7 @@
 
     function searchPreference(){
       setTimeout(function(){
-        if ($("#userSearchText").val() != "") {
+        if ($("#prefField").val() != "") {
           $.ajax({
               url: '/SearchPrefrence/',
               type: 'GET',
@@ -255,6 +255,24 @@
               headers: {'X-CSRFToken':'{{ csrf_token }}'},
               success: function(result) {
                     $("#PrefAvail").html(result);
+              }
+          });
+        }
+      }, 100);
+    }
+
+    function searchEvPreference(){
+      setTimeout(function(){
+        if ($("#EVprefField").val() != "") {
+          $.ajax({
+              url: '/SearchPrefrenceEV/',
+              type: 'GET',
+              data: {
+                'pref':$("#EVprefField").val(),
+              },
+              headers: {'X-CSRFToken':'{{ csrf_token }}'},
+              success: function(result) {
+                    $("#EVPrefAvail").html(result);
               }
           });
         }
@@ -273,6 +291,23 @@
             $("#PrefAvail").html(result['request']);
             if(result['name'] == 'success'){
               $("#curPrefs").html($("#curPrefs").html() +"" + result['name'] + " " + result['id']+"<br/>")
+            }
+          }
+      });
+    }
+
+    function addEVPreference(id){
+      $.ajax({
+          url: '/addPrefrence/',
+          type: 'POST',
+          data: {
+            'EVPrefId':id,
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            $("#EVPrefAvail").html(result['request']);
+            if(result['name'] == 'success'){
+              $("#EVcurPrefs").html($("#EVcurPrefs").html() +"" + result['name'] + " " + result['id']+"<br/>")
             }
           }
       });
@@ -364,9 +399,8 @@
           type: 'POST',
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
-            alert(result['login']);
 	          if(result['login']=='fail'){
-              alert("wrong username or Password");
+             $('#ifError').text("wrong username or Password");
             }
             else{
               setTimeout(function(){
@@ -443,6 +477,10 @@
 	    'mark':mark
           },
           type: 'GET',
+          beforeSend: function(){
+           // Show image container
+           $("#loader").show();
+          },
           success: function(result) {
             $("#mark"+mark).html(result);
             $("#postCreation").click(function(){
@@ -463,6 +501,10 @@
                   }
               });
             });
+          },
+          complete:function(data){
+           // Hide image container
+           $("#loader").hide();
           }
       });
     }

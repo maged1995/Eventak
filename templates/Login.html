@@ -1,9 +1,10 @@
 {% extends "main.html" %}
 {% block content %}
+<title>Login</title>
 <h1 class="title">Sign in</h1>
-  <label for="username">Email or Username: </label><input type="text" placeholder="Email or Password..." name="username" class="username"/><br/>
-  <label for="password">Password: </label><input type="password" placeholder="Password.." name="password" class="password"/><br/>
-  <button onclick="login()">Login</button>
+  <label for="username">Email or Username: </label><input type="text" placeholder="Email or Password..." name="username" class="username"/><label id="ifError"></label><br/>
+  <label for="password">Password: </label><input type="password" placeholder="Password.." name="password" class="password"/></label><br/>
+  <button name="login" onclick="login()">Login</button>
 {{users.0.username}}
 {{users.0.passwordHash}}
 {{users.0.email}}

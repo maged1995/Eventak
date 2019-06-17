@@ -6,7 +6,7 @@ import django
 
 
 def init(request):
-    """type= EventTypes(name="Cinema")
+    type= EventTypes(name="Cinema")
     type.save()
 
     u = Users(birthDate="1995-06-21",username = "maged95", displayName = "Maged A. Saad", dayCreated=django.utils.timezone.now(), verified=True)
@@ -24,12 +24,12 @@ def init(request):
                timeFrom='2019-06-21 08:30', timeTo='2019-06-21 21:30', ifPlaceNum=True, placeNum=60, dayCreated=django.utils.timezone.now())
     e.save()
     e.EventTypes.set(t)
-    """
+    
     e = events.objects.get(id=1)
     u = Users.objects.get(id=1)
     R = UserEvent(event= e, user=u, stat=1, view=True, time=django.utils.timezone.now())
     R.save()
-    '''
+    
     u2 = Users(birthDate="1995-06-21",username = "Moh", displayName = "Mohamed Hamed", email="mohamed@gmail.com", dayCreated=django.utils.timezone.now(),verified=True)
     u2.hash_password("Leila")
     u2.save()
@@ -39,6 +39,6 @@ def init(request):
     u2 = Users.objects.get(id=2)
 
     re = RelStat(f1id = u, f2id = u2, stat=3, time=django.utils.timezone.now())
-    re.save()'''
+    re.save()
 
     return redirect("/")

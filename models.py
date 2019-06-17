@@ -6,7 +6,7 @@ class Users(models.Model):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=False, blank=False)
     username = models.CharField(max_length=24, unique=True, null=False, blank=False)
-    displayName = models.CharField(max_length=16, unique=True, null=False, blank=False)
+    displayName = models.CharField(max_length=16, unique=False, null=False, blank=False)
     passwordHash = models.CharField(max_length=86, null=False, blank=False)
     profilePic = models.ImageField(upload_to='ProfilePic%Y%m%d/')
     birthDate = models.DateField()
@@ -52,9 +52,9 @@ class events(models.Model):
     city = models.CharField(max_length=20, null=False, blank=False)
     booking = models.BooleanField(null=False)
     Creator = models.ForeignKey('Users', on_delete=models.CASCADE)
-    timeFrom = models.DateTimeField(null=True, blank=True)
+    timeFrom = models.DateTimeField(null=False, blank=False)
     timeTo = models.DateTimeField(null=True, blank=True)
-    ifPlaceNum = models.BooleanField(null=False)
+    ifPlaceNum = models.BooleanField(null=False, blank=False)
     placeNum = models.IntegerField(null=True, blank=True)  #### check number of of users currently reserved
     EventTypes = models.ManyToManyField('EventTypes')
     dayCreated = models.DateTimeField(null=True, blank=True)
@@ -82,6 +82,7 @@ class SubEventTypes(models.Model):
 class UserPref(models.Model):
     uid = models.ForeignKey('Users', on_delete=models.CASCADE)
     etid = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
+    isPref = models.BooleanField(null=False, blank=False)
     time = models.DateTimeField(null=False, blank=False)
 
 class UserEvent(models.Model):

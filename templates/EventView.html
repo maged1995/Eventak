@@ -14,10 +14,11 @@
   {{numOfGoing}}
 {% endif %}
 <br/>
+{% if request.session.UserInfo != "" %}
 {% if not attending %}
 Going?
 <div id="EvAttend{{id}}"><button type="button" onclick="attend({{id}})" class="btn btn-info">Yes</button></div>
 {% endif %}
 <div id="EvHide{{id}}"><button type="button" onclick="hide({{id}})" class="btn btn-info">Hide</button></div>
-
+{% endif %}
 {% endblock %}

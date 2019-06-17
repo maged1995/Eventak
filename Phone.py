@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
-from Eventak.models import Users, RelStat
+from Eventak.models import Users, RelStat, events, UserEvent
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.db import connection
@@ -28,7 +28,8 @@ def login(request):
                     'login':'success',
                     'UserInfo':{
                         'username':us.username,
-                        'email':'',
+                        'email':us.email,
+                        'id':us.id
                         ###'profilePic':us.profilePic,
                         #'birthDate':us.birthDate
                     }
@@ -44,6 +45,31 @@ def login(request):
         }
     return JsonResponse(res)
     #return HttpResponse(template.render(res, request))
+
+def Signup(request):
+    if request.method == "GET":
+        res1 = Users.objects.filter(username=request.GET.get("username"))
+        if res1:
+            return JsonResponse({'request':'username already Taken'})
+        else:
+            u = Users(birthDate= request.GET.get("Year")+"-"+ request.GET.get("Month") +"-" + request.GET.get("Day"), displayName = request.GET.get("displayName"),
+                      username = request.GET.get("username"), dayCreated = django.utils.timezone.now(),
+                      email = request.GET.get("email"), verified=True)
+            u.hash_password(request.GET.get("password"))
+            u.save()
+            return JsonResponse({'request':'success'})
+
+
+def attend(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=request.GET.get("myID"))
+        e = events.objects.get(id=request.GET.get("evID"))
+        ue = UserEvent.objects.all().filter(user=u, event=e)
+        if not len(ue)>0:
+            newGo = UserEvent(user=u, event=e, stat=1, view=True)
+            newGo.save()
+            return JsonResponse({'Attend': 'success'})
+        return JsonResponse({'Attend': 'already on Attend'})
 
 @csrf_exempt
 def PhoneLogin(request):
@@ -121,6 +147,21 @@ def findUser(request):
               res['users'] = usRes
               return JsonResponse({'result':res})
            return JsonResponse({'user':'none'})
+
+def findUserByUsername(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id = str(request.GET.get('myID')))
+        ru = Users.objects.all().filter(username = request.GET.get('nameR'))
+        if ru:
+            res = {'Found':'True', 'id':ru[0].id, 'email':ru[0].email, 'username':ru[0].username, 'name':ru[0].displayName,}
+            rel = RelStat.objects.all().filter(f1id=u, f2id=ru[0]).order_by('-time')
+            if rel:
+                res['stat'] = rel[0].stat
+            else:
+                res['stat'] = 0
+            return JsonResponse({'result':res})
+        else:
+            return JsonResponse({'result':'not found'})
 
 def requestFriendship(request):
     if request.method == 'GET' and request.GET.get('myID')!=request.GET.get('idR'):
