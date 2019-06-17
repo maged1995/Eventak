@@ -27,8 +27,8 @@ class PicUploads(models.Model):
     time = models.DateTimeField(null=True, blank=True)
 
 class RelStat(models.Model):
-    f1id = models.ForeignKey('Users', related_name= 'f', on_delete=models.CASCADE)  #from
-    f2id = models.ForeignKey('Users', related_name= 't', on_delete=models.CASCADE)  #to
+    u1 = models.ForeignKey('Users', related_name= 'f', on_delete=models.CASCADE)  #from
+    u2 = models.ForeignKey('Users', related_name= 't', on_delete=models.CASCADE)  #to
     stat = models.IntegerField(null=False, blank=False)
     time = models.DateTimeField()
 
@@ -76,12 +76,12 @@ class UserRev(models.Model):
 
 
 class SubEventTypes(models.Model):
-    E1id = models.ForeignKey('EventTypes', related_name= 'p', on_delete=models.CASCADE) #parent
-    E2id = models.ForeignKey('EventTypes', related_name= 'c', on_delete=models.CASCADE) #child
+    E1 = models.ForeignKey('EventTypes', related_name= 'p', on_delete=models.CASCADE) #parent
+    E2 = models.ForeignKey('EventTypes', related_name= 'c', on_delete=models.CASCADE) #child
 
 class UserPref(models.Model):
-    uid = models.ForeignKey('Users', on_delete=models.CASCADE)
-    etid = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
+    user = models.ForeignKey('Users', on_delete=models.CASCADE)
+    eType = models.ForeignKey('EventTypes', on_delete=models.CASCADE)
     isPref = models.BooleanField(null=False, blank=False)
     time = models.DateTimeField(null=False, blank=False)
 

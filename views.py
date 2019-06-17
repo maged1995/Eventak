@@ -181,7 +181,7 @@ def Signup(request):
             '''VALIDATE PHONENUMBER IS ALL NUMBERS
             VALIDATE DAYS IN MONTH'''
         else:
-            u = Users(birthDate=request.POST.get("Year")+"-"+ request.POST.get("Month") +"-" + request.POST.get("Day"), 
+            u = Users(birthDate=request.POST.get("Year")+"-"+ request.POST.get("Month") +"-" + request.POST.get("Day"),
                       displayName = request.POST.get("displayName"),
                       username = request.POST.get("username"), dayCreated = django.utils.timezone.now(),
                       email = request.POST.get("email"), verified=True)
@@ -471,7 +471,7 @@ def newPref(request):
                 newET.save()
                 us = Users.objects.all().filter(id=request.session['UserInfo']['UserInfo']['id'])
                 if(us):
-                    newP = UserPref(uid = us[0], etid = newET, isPref=True, time =django.utils.timezone.now())
+                    newP = UserPref(user = us[0], eType = newET, isPref=True, time =django.utils.timezone.now())
                     newP.save()
                     return JsonResponse({'request':'success', 'id':newET.id, 'name':newET.name})
 
@@ -480,11 +480,11 @@ def addPref(request):
     if(us):
         et = EventTypes.objects.get(id =str(request.POST.get('PrefId')))
         if et:
-            up = UserPref.objects.all().filter(uid = us, etid=et, isPref=True)
+            up = UserPref.objects.all().filter(user = us, eType=et, isPref=True)
             if(up):
                 return JsonResponse({'request':'already done'})
             else:
-                newP = UserPref(uid = us, etid = et, isPref=True, time =django.utils.timezone.now())
+                newP = UserPref(user = us, eType = et, isPref=True, time =django.utils.timezone.now())
                 newP.save()
                 return JsonResponse({'request':'success', 'id':et.id, 'name':et.name})
         else:
@@ -495,12 +495,12 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.all().filter(uid = ui, isPref=True)
+        up = UserPref.objects.all().filter(user = ui, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
-                EvT[i]['id'] = up[i].etid.id
-                EvT[i]['name'] = up[i].etid.name
+                EvT[i]['id'] = up[i].eType.id
+                EvT[i]['name'] = up[i].eType.name
             res = {
                 'load':'success',
                 'name':u.displayName,
@@ -537,7 +537,7 @@ def findUserPage(request):
 def findUser(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-           cursor.execute("""SELECT DISTINCT ON(us.id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.f2id_id AND rel.f1id_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,f1id_id,f2id_id,time ORDER BY us.id,time DESC NULLS LAST""")
+           cursor.execute("""SELECT DISTINCT ON(us.id) "displayName",us.id,email,username,"profilePic",stat FROM "Eventak_users" as us LEFT JOIN "Eventak_relstat" as rel ON us.id=rel.u2_id AND rel.u1_id=""" + str(request.session['UserInfo']['UserInfo']['id']) + """ WHERE ((LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%')) OR (LOWER("displayName") LIKE LOWER('%"""+request.GET.get('nameR')+"""%'))) GROUP BY us.id,stat,u1_id,u2_id,time ORDER BY us.id,time DESC NULLS LAST""")
            us = namedtuplefetchall(cursor)
            template = loader.get_template('userSearchRes.html')
            if(us):
@@ -560,20 +560,20 @@ def requestFriendship(request):
             return JsonResponse({'request':'fail'})
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        relation = RelStat.objects.all().filter(f1id=ru, f2id=u)
+        relation = RelStat.objects.all().filter(u1=ru, u2=u)
         if(relation):
             if relation[0].stat<=-1 or relation[0].stat<=2:
                 return JsonResponse({'request':'fail'})
             else:
-                newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())
+                newRel = RelStat(u1=u, u2=ru, stat = 2, time=django.utils.timezone.now())
                 newRel.save()
-                newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+                newRel2 = RelStat(u1=ru, u2=u, stat = 3, time=django.utils.timezone.now())
                 newRel2.save()
                 return JsonResponse({'request':'success'})
         else:
-            newRel = RelStat(f1id=u, f2id=ru, stat = 2, time=django.utils.timezone.now())
+            newRel = RelStat(u1=u, u2=ru, stat = 2, time=django.utils.timezone.now())
             newRel.save()
-            newRel2 = RelStat(f1id=ru, f2id=u, stat = 3, time=django.utils.timezone.now())
+            newRel2 = RelStat(u1=ru, u2=u, stat = 3, time=django.utils.timezone.now())
             newRel2.save()
             return JsonResponse({'request':'success'})
 
@@ -592,7 +592,7 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        rel = RelStat.objects.all().filter(f1id=u, stat=3)
+        rel = RelStat.objects.all().filter(u1=u, stat=3)
         if(rel):
             usRes = [{} for _ in range(len(rel))]
             for i in range(0,len(rel)):
@@ -612,11 +612,11 @@ def acceptFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(u1=u, u2=ru, stat=3)
         if(rel):
-            newRel = RelStat(f1id=u, f2id=ru, stat = 5, time=django.utils.timezone.now())
+            newRel = RelStat(u1=u, u2=ru, stat = 5, time=django.utils.timezone.now())
             newRel.save()
-            newRel2 = RelStat(f1id=ru, f2id=u, stat = 5, time=django.utils.timezone.now())
+            newRel2 = RelStat(u1=ru, u2=u, stat = 5, time=django.utils.timezone.now())
             newRel2.save()
             return JsonResponse({'request':'success'})
         else:
@@ -626,9 +626,9 @@ def hideFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(f1id=u, f2id=ru, stat=3)
+        rel = RelStat.objects.all().filter(u1=u, u2=ru, stat=3)
         if(rel):
-            newRel = RelStat(f1id=u, f2id=ru, stat = -1, time=django.utils.timezone.now())
+            newRel = RelStat(u1=u, u2=ru, stat = -1, time=django.utils.timezone.now())
             newRel.save()
             return JsonResponse({'request':'success'})
         else:
