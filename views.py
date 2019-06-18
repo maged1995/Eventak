@@ -244,10 +244,28 @@ def attend(request):
         e = events.objects.get(id=request.POST.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not len(ue)>0:
-            newGo = UserEvent(user=u, event=e, stat=1, view=True, time = django.utils.timezone.now())
+            newGo = UserEvent(user=u, event=e, stat=2, view=True, time = django.utils.timezone.now())
             newGo.save()
             return JsonResponse({'Attend': 'success'})
         return JsonResponse({'Attend': 'Failure'})
+
+def invite(request):
+    if request.method == 'POST':
+        u1 = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        u2 = Users.objects.get(id=request.POST.get('uidR'))
+        e = events.objects.get(id=request.POST.get('eid'))
+        rel = RelStat.objects.all().filter(u1 = u1, u2 = u2).order_by('-time')
+        if rel and e:
+            fRel = rel.filter(stat=3)
+            if(fRel):
+                newIn = invites(u1 = u1, u2 = u2, event= e, seen = False, time = django.utils.timezone.now())
+                newIn.save()
+                return JsonResponse({'Invite': 'success'})
+            else:
+                return JsonResponse({'Invite': 'fail'})
+        else:
+            return JsonResponse({'Invite': 'event or relationship not found'})
+
 
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
@@ -495,7 +513,7 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.all().filter(user = u, isPref=True)
+        up = UserPref.objects.all().filter(user = ui, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
@@ -560,9 +578,9 @@ def requestFriendship(request):
             return JsonResponse({'request':'fail'})
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        relation = RelStat.objects.all().filter(u1=ru, u2=u)
+        relation = RelStat.objects.all().filter(u1=ru, u2=u).order_by('-time')
         if(relation):
-            if relation[0].stat<=-1 or relation[0].stat<=2:
+            if relation[0].stat<=-1 or relation[0].stat>=2:
                 return JsonResponse({'request':'fail'})
             else:
                 newRel = RelStat(u1=u, u2=ru, stat = 2, time=django.utils.timezone.now())
@@ -592,17 +610,21 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        rel = RelStat.objects.all().filter(u1=u, stat=3)
+        rel = RelStat.objects.all().filter(u1=u).order_by('-time').distinct('u1','u2')
         if(rel):
-            usRes = [{} for _ in range(len(rel))]
-            for i in range(0,len(rel)):
-                ru = Users.objects.get(id=rel[i].id)
-                usRes[i]['id'] = ru.id
-                usRes[i]['email'] = ru.email
-                usRes[i]['username'] = ru.username
-                #usRes[i]['profilePic'] = ru.profilePic
-                usRes[i]['name'] = ru.displayName
-            res = {'requests': usRes}
+            fRel = rel.filter(stat=3)
+            if(fRel):
+                usRes = [{} for _ in range(len(fRel))]
+                for i in range(0,len(fRel)):
+                    ru = Users.objects.get(id=fRel[i].id)
+                    usRes[i]['id'] = ru.id
+                    usRes[i]['email'] = ru.email
+                    usRes[i]['username'] = ru.username
+                    #usRes[i]['profilePic'] = ru.profilePic
+                    usRes[i]['name'] = ru.displayName
+                res = {'requests': usRes}
+            else:
+                res = {'requests': 'none'}
         else:
             res = {'requests': 'none'}
         template = loader.get_template('userRequests.html')
@@ -612,27 +634,33 @@ def acceptFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(u1=u, u2=ru, stat=3)
+        rel = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time').distinct('u1','u2')
         if(rel):
-            newRel = RelStat(u1=u, u2=ru, stat = 5, time=django.utils.timezone.now())
-            newRel.save()
-            newRel2 = RelStat(u1=ru, u2=u, stat = 5, time=django.utils.timezone.now())
-            newRel2.save()
-            return JsonResponse({'request':'success'})
+            if rel[0].stat == 3:
+                newRel = RelStat(u1=u, u2=ru, stat = 5, time=django.utils.timezone.now())
+                newRel.save()
+                newRel2 = RelStat(u1=ru, u2=u, stat = 5, time=django.utils.timezone.now())
+                newRel2.save()
+                return JsonResponse({'request':'success'})
+            else:
+                return JsonResponse({'request':'No Request Received'})
         else:
-            return JsonResponse({'request':'No Request Receive'})
+            return JsonResponse({'request':'No Request Received'})
 
 def hideFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(u1=u, u2=ru, stat=3)
+        rel = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time').distinct('u1','u2')
         if(rel):
-            newRel = RelStat(u1=u, u2=ru, stat = -1, time=django.utils.timezone.now())
-            newRel.save()
-            return JsonResponse({'request':'success'})
+            if rel[0].stat == 3:
+                newRel = RelStat(u1=u, u2=ru, stat = -1, time=django.utils.timezone.now())
+                newRel.save()
+                return JsonResponse({'request':'success'})
+            else:
+                return JsonResponse({'request':'No Request Received'})
         else:
-            return JsonResponse({'request':'No Request Receive'})
+            return JsonResponse({'request':'No Request Received'})
 
 def calcDay(date):
     d = date.split('-')
