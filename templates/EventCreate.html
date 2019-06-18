@@ -8,13 +8,12 @@
   <label for="city">city: </label><input type="text" placeholder="city" name="city"/><br/>
   <input type="text" id="EVprefField" onkeydown="searchEvPreference()"/>
   <button onClick="EVcreatePref()">Add New Preference</button>
-  <div class="loader"></div>
   <div id="EVcurPrefs">
   <div id="EVPrefAvail"/></div>
   <label for="DateTime">Date Time: </label><br/>
   {{ form }}
   <input type="submit" value="Create"/>
-  <div class="loader" hiddent></div>
+  <div class="loader" style="display: none;"></div>
 </form>
 
 <!-- google, facebook, and other login api's will be here -->

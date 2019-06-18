@@ -495,7 +495,7 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.all().filter(user = ui, isPref=True)
+        up = UserPref.objects.all().filter(user = u, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
