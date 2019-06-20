@@ -6,7 +6,7 @@ import django
 
 
 def init(request):
-    """type= EventTypes(name="Cinema")
+    type= EventTypes(name="Cinema")
     type.save()
 
     u = Users(birthDate="1995-06-21",username = "maged95", displayName = "Maged A. Saad", dayCreated=django.utils.timezone.now(), verified=True)
@@ -34,7 +34,7 @@ def init(request):
     u2.hash_password("Leila")
     u2.save()
 
-    R.save()"""
+    R.save()
     u = Users.objects.get(id=1)
     u2 = Users.objects.get(id=2)
 

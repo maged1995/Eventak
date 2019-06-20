@@ -94,8 +94,8 @@ class UserEvent(models.Model):
     time = models.DateTimeField(null=False, blank=False)
 
 class invites(models.Model):
-    u1 = models.ForeignKey('Users', related_name= 'f', on_delete=models.CASCADE)  #from
-    u2 = models.ForeignKey('Users', related_name= 't', on_delete=models.CASCADE)  #to
+    u1 = models.ForeignKey('Users', related_name= 'fr', on_delete=models.CASCADE)  #from
+    u2 = models.ForeignKey('Users', related_name= 'to', on_delete=models.CASCADE)  #to
     event = models.ForeignKey('events', on_delete=models.CASCADE, null=False, blank=False)
     seen = models.BooleanField(null=False, blank=False)
     time = models.DateTimeField(null=False, blank=False)

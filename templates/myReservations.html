@@ -8,7 +8,8 @@
     {{event.location}}
     <div id="{{event.reservationsId}}" class="updateSection">
       <label>{{event.reservationQuantity}}</label>
-      <button type="button" name="add">Add Reservations</button>
+      <button type="button" onclick="friendInviteList({{event.id}})">invite</button>
+      <div id="friendsToInvite{{event.id}}"></div>
       <button type="button" class="cancelRes" name="cancelRes">Cancel Reservations</button>
     </div>
   </div>

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
-from Eventak.models import Users, RelStat, events, UserEvent
+from Eventak.models import Users, RelStat, events, UserEvent, invites
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.db import connection
@@ -234,3 +234,47 @@ def hideFriendRequest(request):
                 return JsonResponse({'request':'failure'})
         else:
             return JsonResponse({'request':'No Request Receive'})
+
+def showFriends(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=str(request.GET.get('myID')))
+        rel1 = RelStat.objects.all().filter(u1=u).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=rel1).distinct('u1','u2')
+        if(rel):
+            fRel = rel.filter(stat=5)
+            if(fRel):
+                usRes = [{} for _ in range(len(fRel))]
+                for i in range(0,len(fRel)):
+                    ru = Users.objects.get(id=fRel[i].id)
+                    usRes[i]['id'] = str(ru.id)
+                    usRes[i]['email'] = ru.email
+                    usRes[i]['username'] = ru.username
+                    #usRes[i]['profilePic'] = ru.profilePic
+                    usRes[i]['name'] = ru.displayName
+                res = {'requests': usRes}
+            else:
+                res = {'requests': 'none'}
+        else:
+            res = {'requests': 'none'}
+        return JsonResponse(res)
+
+def invite(request):
+    if request.method == 'GET':
+        u1 = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        u2 = Users.objects.get(id=request.GET.get('uidR'))
+        e = events.objects.get(id=request.GET.get('eid'))
+        relf = RelStat.objects.all().filter(u1 = u1, u2 = u2).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=relf).distinct('u1','u2')
+        if rel and e:
+            fRel = rel.filter(stat=5)
+            if(fRel):
+                inv = invites.objects.all().filter(u1= u1, u2= u2, event=e)
+                if(inv):
+                    return JsonResponse({'Invite': 'already sent'})
+                newIn = invites(u1 = u1, u2 = u2, event= e, seen = False, time = django.utils.timezone.now())
+                newIn.save()
+                return JsonResponse({'Invite': 'success'})
+            else:
+                return JsonResponse({'Invite': 'fail'})
+        else:
+            return JsonResponse({'Invite': 'event or relationship not found'})

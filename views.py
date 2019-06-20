@@ -7,6 +7,7 @@ import random, string, django
 from django.db import connection
 from collections import namedtuple
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Max
 
 def namedtuplefetchall(cursor):
     "Return all rows from a cursor as a namedtuple"
@@ -254,10 +255,14 @@ def invite(request):
         u1 = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         u2 = Users.objects.get(id=request.POST.get('uidR'))
         e = events.objects.get(id=request.POST.get('eid'))
-        rel = RelStat.objects.all().filter(u1 = u1, u2 = u2).order_by('-time')
+        relf = RelStat.objects.all().filter(u1 = u1, u2 = u2).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=relf).distinct('u1','u2')
         if rel and e:
-            fRel = rel.filter(stat=3)
+            fRel = rel.filter(stat=5)
             if(fRel):
+                inv = invites.objects.all().filter(u1= u1, u2= u2, event=e)
+                if(inv):
+                    return JsonResponse({'Invite': 'already sent'})
                 newIn = invites(u1 = u1, u2 = u2, event= e, seen = False, time = django.utils.timezone.now())
                 newIn.save()
                 return JsonResponse({'Invite': 'success'})
@@ -401,24 +406,32 @@ def displayMyEvents(request):
 
 def displayReservations(request):
     us = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])   #request.session['User']["UserInfo"]["username"])
-    Reservations = UserEvent.objects.all().filter(user=us, stat=1)
+    Reservations1 = UserEvent.objects.all().filter(user=us).order_by('-time')
+    Reservations = UserEvent.objects.all().filter(id__in=Reservations1).distinct('user','event')
     if (Reservations):
-        E = [{} for _ in range(len(Reservations))]
-        for i in range(0,len(Reservations)):
-            Event = Reservations[i].event
-            E[i]['name']=Event.name
-            E[i]['Description']=Event.description
-            E[i]['location']=Event.location
-            E[i]['city']=Event.city
-            E[i]['id']=Event.id
-            E[i]['booking']= str(Event.booking)
-            E[i]['CreatorID']=Event.Creator.id
-            E[i]['reservationsId']=Reservations[i].id
-        res = {
-            'Found':'True',
-            'Events':E
+        resf = Reservations.filter(stat=1)
+        if (resf):
+            E = [{} for _ in range(len(resf))]
+            for i in range(0,len(resf)):
+                Event = resf[i].event
+                E[i]['name']=Event.name
+                E[i]['Description']=Event.description
+                E[i]['location']=Event.location
+                E[i]['city']=Event.city
+                E[i]['id']=Event.id
+                E[i]['booking']= str(Event.booking)
+                E[i]['CreatorID']=Event.Creator.id
+                E[i]['reservationsId']=resf[i].id
+            res = {
+                'Found':'True',
+                'Events':E
+                    #'day':Event.day,
+            }
+        else:
+            res = {
+                'Found':'false'
                 #'day':Event.day,
-        }
+            } 
     else:
         res = {
             'Found':'false'
@@ -438,11 +451,14 @@ def CancelRes(request, event):
     if request.method == 'DELETE':
         e = events.objects.get(id=event)
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        res = UserEvent.objects.all().filter(event=e, user=u)
-        res[0].stat = 0
-        res[0].save()
-        print(event)
-        return JsonResponse({'request':str(res[0].event.id)})
+        res1 = UserEvent.objects.all().filter(event=e, user=u).order_by('-time')
+        res = UserEvent.objects.all().filter(id__in=res1).distinct('user','event')
+        if res[0].stat == 1:
+            newRes = UserEvent(event=e, user=u, stat=0, time=django.utils.timezone.now())
+            newRes.save()
+            return JsonResponse({'request':'success'})
+        else:
+            return JsonResponse({'request':'event not reserved'})
 
 
 def findPref(request):
@@ -513,7 +529,7 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
-        up = UserPref.objects.all().filter(user = ui, isPref=True)
+        up = UserPref.objects.all().filter(user = u, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
@@ -610,7 +626,8 @@ def displayArtists(request):
 def userRequests(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
-        rel = RelStat.objects.all().filter(u1=u).order_by('-time').distinct('u1','u2')
+        rel1 = RelStat.objects.all().filter(u1=u).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=rel1).distinct('u1','u2')
         if(rel):
             fRel = rel.filter(stat=3)
             if(fRel):
@@ -634,7 +651,8 @@ def acceptFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time').distinct('u1','u2')
+        rel1 = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=rel1).distinct('u1','u2')
         if(rel):
             if rel[0].stat == 3:
                 newRel = RelStat(u1=u, u2=ru, stat = 5, time=django.utils.timezone.now())
@@ -651,7 +669,9 @@ def hideFriendRequest(request):
     if request.method == 'POST':
         u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
         ru = Users.objects.get(id = request.POST.get('idR'))
-        rel = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time').distinct('u1','u2')
+        m = RelStat.objects.latest('time')
+        rel1 = RelStat.objects.all().filter(u1=u, u2=ru).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=rel1).distinct('u1','u2')
         if(rel):
             if rel[0].stat == 3:
                 newRel = RelStat(u1=u, u2=ru, stat = -1, time=django.utils.timezone.now())
@@ -661,6 +681,29 @@ def hideFriendRequest(request):
                 return JsonResponse({'request':'No Request Received'})
         else:
             return JsonResponse({'request':'No Request Received'})
+
+def showFriends(request):
+    if request.method == 'GET':
+        u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        rel1 = RelStat.objects.all().filter(u1=u).order_by('-time')
+        rel = RelStat.objects.all().filter(id__in=rel1).distinct('u1','u2')
+        if(rel):
+            fRel = rel.filter(stat=5)
+            if(fRel):
+                usRes = [{} for _ in range(len(fRel))]
+                for i in range(0,len(fRel)):
+                    ru = Users.objects.get(id=fRel[i].id)
+                    usRes[i]['id'] = str(ru.id)
+                    usRes[i]['email'] = ru.email
+                    usRes[i]['username'] = ru.username
+                    #usRes[i]['profilePic'] = ru.profilePic
+                    usRes[i]['name'] = ru.displayName
+                res = {'requests': usRes}
+            else:
+                res = {'requests': 'none'}
+        else:
+            res = {'requests': 'none'}
+        return JsonResponse(res)
 
 def calcDay(date):
     d = date.split('-')

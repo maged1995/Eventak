@@ -19,7 +19,7 @@
 	</body>
   <script>
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    var map, infoWindow, markerInd=1, activeEventsMarkers = [];
+    var map, infoWindow, markerInd=1, activeEventsMarkers = [], friendsList = "";
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
@@ -210,6 +210,38 @@
           success: function(result) {
             console.log(result);
                 $("#EvAttend"+id).html(result);
+          }
+      });
+    }
+
+    function friendInviteList(evID){
+      $.ajax({
+          url: '/myFriends/',
+          type: 'GET',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+            var friendsList = "";
+            alert(JSON.stringify(result["requests"]));
+            result["requests"].forEach(function(i){
+              friendsList += "<div>"+i["name"]+"<button onclick='invite("+i["id"]+","+evID+")'>Invite</button></div>";
+              alert(friendsList);
+            });
+                $("#friendsToInvite"+evID).html(friendsList);
+          }
+      });
+    }
+
+    function invite(uid,evID){
+      $.ajax({
+          url: '/invite/',
+          type: 'POST',
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          data: {
+            'eid':evID,
+            'uidR':uid,
+          },
+          success: function(result) {
+            alert(result['Invite']);
           }
       });
     }
