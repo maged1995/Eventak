@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from Eventak.models import events, Users, Reservations, EventTypes, UserEvent, RelStat
 from .forms import *
-import random, string, django
+import random, string, django, json
 from django.db import connection
 from collections import namedtuple
 from django.core.files.storage import FileSystemStorage
@@ -70,7 +70,14 @@ def activeEvents(request):
                         E[i]['id']=Events[i].id
                         E[i]['show']='true'
             else:
-                E[i]['show']='false'
+                E[i]['Name']=str(Events[i].name)
+                E[i]['Map']={
+                    'locLong':Events[i].locLong,
+                    'locLat':Events[i].locLat
+                }
+                E[i]['CreatorID']=Events[i].Creator.id
+                E[i]['id']=Events[i].id
+                E[i]['show']='true'
         else:
             E[i]['Name']=str(Events[i].name)
             E[i]['Map']={
@@ -291,10 +298,15 @@ def CreateEvent(request): #EDIT NEEDED
                    ifPlaceNum=True, placeNum=60,
                    dayCreated=django.utils.timezone.now())
         e.save()
+        print(request.POST.get('prefs'))
+        for p in json.loads(request.POST.get('prefs')):
+            et = EventTypes.objects.get(id = str(p))
+            e.EventTypes.add(et)
+            e.save()
         #e.EventTypes.add(t)
         #e.save()
         print("pass")
-        return redirect("/")
+        return JsonResponse({'request':'success'})
     elif request.method=='GET':
         if request.session['UserInfo']!='':
             res={
@@ -409,7 +421,7 @@ def displayReservations(request):
     Reservations1 = UserEvent.objects.all().filter(user=us).order_by('-time')
     Reservations = UserEvent.objects.all().filter(id__in=Reservations1).distinct('user','event')
     if (Reservations):
-        resf = Reservations.filter(stat=1)
+        resf = Reservations.filter(stat=2)
         if (resf):
             E = [{} for _ in range(len(resf))]
             for i in range(0,len(resf)):
@@ -454,7 +466,7 @@ def CancelRes(request, event):
         res1 = UserEvent.objects.all().filter(event=e, user=u).order_by('-time')
         res = UserEvent.objects.all().filter(id__in=res1).distinct('user','event')
         if res[0].stat == 1:
-            newRes = UserEvent(event=e, user=u, stat=0, time=django.utils.timezone.now())
+            newRes = UserEvent(event=e, user=u, stat=0, view = True, time=django.utils.timezone.now())
             newRes.save()
             return JsonResponse({'request':'success'})
         else:

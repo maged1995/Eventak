@@ -66,7 +66,7 @@ def attend(request):
         e = events.objects.get(id=request.GET.get("evID"))
         ue = UserEvent.objects.all().filter(user=u, event=e)
         if not len(ue)>0:
-            newGo = UserEvent(user=u, event=e, stat=1, view=True)
+            newGo = UserEvent(user=u, event=e, stat=2, view=True, time = django.utils.timezone.now())
             newGo.save()
             return JsonResponse({'Attend': 'success'})
         return JsonResponse({'Attend': 'already on Attend'})
@@ -106,7 +106,8 @@ def Find(request):
         if(Events):
             E = [{} for _ in range(len(Events))]
             for i in range(0,len(Events)):
-                E[i]['Name']=str(Events[i].name),
+                E[i]['id']=str(Events[i].id)
+                E[i]['Name']=str(Events[i].name)
                 E[i]['description']=Events[i].description
                 E[i]['location']=Events[i].location
                 E[i]['city']=Events[i].city
@@ -260,7 +261,7 @@ def showFriends(request):
 
 def invite(request):
     if request.method == 'GET':
-        u1 = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+        u1 = Users.objects.get(id=request.GET.get('myID'))
         u2 = Users.objects.get(id=request.GET.get('uidR'))
         e = events.objects.get(id=request.GET.get('eid'))
         relf = RelStat.objects.all().filter(u1 = u1, u2 = u2).order_by('-time')

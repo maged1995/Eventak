@@ -1,20 +1,20 @@
 {% extends "main.html" %}
 {% block content %}
 <h1 class="title">Create Event</h1>
-<form method="post" action="/EventCreate/">{% csrf_token %}
-  <label for="EventName">Event Name: </label><input type="text" placeholder="EventName" name="EventName"/><br/>
-  <label for="description">Description: </label><input type="text" placeholder="description" name="description"/><br/>
-  <label for="location">Location: </label><input type="text" placeholder="location" name="location"/><br/>
-  <label for="city">city: </label><input type="text" placeholder="city" name="city"/><br/>
+{% csrf_token %}
+  <label for="EventName">Event Name: </label><input type="text" placeholder="EventName" id="EventName"/><br/>
+  <label for="description">Description: </label><input type="text" placeholder="description" id="description"/><br/>
+  <label for="location">Location: </label><input type="text" placeholder="location" id="location"/><br/>
+  <label for="city">city: </label><input type="text" placeholder="city" id="city"/><br/>
   <input type="text" id="EVprefField" onkeydown="searchEvPreference()"/>
   <button onClick="EVcreatePref()">Add New Preference</button>
-  <div id="EVcurPrefs">
-  <div id="EVPrefAvail"/></div>
+  <div id="EVcurPrefs"></div>
+  <div id="EVPrefAvail"></div>
   <label for="DateTime">Date Time: </label><br/>
   {{ form }}
-  <input type="submit" value="Create"/>
+  <button onClick="eventCreate({{mark}})">Create</button>
   <div class="loader" style="display: none;"></div>
-</form>
+
 
 <!-- google, facebook, and other login api's will be here -->
 {% endblock %}

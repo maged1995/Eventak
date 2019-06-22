@@ -2,8 +2,7 @@
 {% block content %}
 
 {% for p in prefs %}
-{{p.name}}
-<button onClick="addEVPreference({{p.id}})">Add Preference</button>
+<label onclick="addEVPreference({{p.id}})">{{p.name}}</label>
 {% endfor %}
 
 {% endblock %}

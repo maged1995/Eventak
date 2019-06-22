@@ -19,7 +19,7 @@
 	</body>
   <script>
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    var map, infoWindow, markerInd=1, activeEventsMarkers = [], friendsList = "";
+    var map, infoWindow, markerInd=1, activeEventsMarkers = [], friendsList = "", EvPrefs = [];
     function initMap() {
       infoWindow = new google.maps.InfoWindow;
       map = new google.maps.Map(document.getElementById('map'), {
@@ -352,20 +352,7 @@
     }
 
     function addEVPreference(id){
-      $.ajax({
-          url: '/addPrefrence/',
-          type: 'POST',
-          data: {
-            'EVPrefId':id,
-          },
-          headers: {'X-CSRFToken':'{{ csrf_token }}'},
-          success: function(result) {
-            $("#EVPrefAvail").html(result['request']);
-            if(result['name'] == 'success'){
-              $("#EVcurPrefs").html($("#EVcurPrefs").html() +"" + result['name'] + " " + result['id']+"<br/>")
-            }
-          }
-      });
+      EvPrefs[EvPrefs.length]=id;
     }
 
     function updateProfPic(){
@@ -529,7 +516,7 @@
           data: {
             'lng':lng,
             'lat':lat,
-	    'mark':mark
+            'mark':mark
           },
           type: 'GET',
           beforeSend: function(){
@@ -539,22 +526,6 @@
           success: function(result) {
             $("#mark"+mark).html(result);
             $("#postCreation").click(function(){
-              $.ajax({
-                  url: '/EventCreate/',
-                  type: 'POST',
-                  data: {
-                    'EventName':$('EventName').val(),
-                    'description':$('EventName').val(),
-                    'location':$('EventName').val(),
-                    'city':$('EventName').val(),
-                    'Date_From':$('Date_From').val(),
-                    'Date_To':$('Date_To').val(),
-                  },
-                  headers: {'X-CSRFToken':'{{ csrf_token }}'},
-                  success: function(result) {
-                      $("#mark"+mark).html("Event Created");
-                  }
-              });
             });
           },
           complete:function(data){
@@ -562,6 +533,27 @@
            $("#loader").hide();
           }
       });
+    }
+
+    function eventCreate(mark){
+      alert(JSON.stringify(EvPrefs));
+      $.ajax({
+          url: '/EventCreate/',
+          type: 'POST',
+          data: {
+            'EventName':$('#EventName').val(),
+            'description':$('#description').val(),
+            'location':$('#location').val(),
+            'city':$('#city').val(),
+            'Date_From':$('#id_Date_From').val(),
+            'Date_To':$('#id_Date_To').val(),
+            'prefs': JSON.stringify(EvPrefs)
+          },
+          headers: {'X-CSRFToken':'{{ csrf_token }}'},
+          success: function(result) {
+              $("#mark"+mark).html("Event Created");
+          }
+        });
     }
 
     $(".nav-link").click(function(){
