@@ -279,3 +279,61 @@ def invite(request):
                 return JsonResponse({'Invite': 'fail'})
         else:
             return JsonResponse({'Invite': 'event or relationship not found'})
+
+def myInvitations(request):
+    u2 = Users.objects.get(id=request.GET.get('myID'))
+    ins = invites.objects.all().filter(u2=u2, seen=False)
+    if(ins):
+        Invs = [{} for _ in range(len(ins))]
+        for i in range(0,len(ins)):
+            Event = ins[i].event
+            Invs[i]['name']=Event.name
+            Invs[i]['Description']=Event.description
+            Invs[i]['location']=Event.location
+            Invs[i]['city']=Event.city
+            Invs[i]['id']=Event.id
+            Invs[i]['booking']= str(Event.booking)
+            Invs[i]['CreatorID']=Event.Creator.id
+            Invs[i]['invitationId']=ins[i].id
+        res = {
+            'Found':'True',
+            'Events':Invs
+                #'day':Event.day,
+        }
+        return JsonResponse(res)
+    return JsonResponse({'Found':'False'})
+
+def displayReservations(request):
+    us = Users.objects.get(id=request.GET.get('myID'))   #request.session['User']["UserInfo"]["username"])
+    Reservations1 = UserEvent.objects.all().filter(user=us).order_by('-time')
+    Reservations = UserEvent.objects.all().filter(id__in=Reservations1).distinct('user','event')
+    if (Reservations):
+        resf = Reservations.filter(stat=2)
+        if (resf):
+            E = [{} for _ in range(len(resf))]
+            for i in range(0,len(resf)):
+                Event = resf[i].event
+                E[i]['name']=Event.name
+                E[i]['Description']=Event.description
+                E[i]['location']=Event.location
+                E[i]['city']=Event.city
+                E[i]['id']=Event.id
+                E[i]['booking']= str(Event.booking)
+                E[i]['CreatorID']=Event.Creator.id
+                E[i]['reservationsId']=resf[i].id
+            res = {
+                'Found':'True',
+                'Events':E
+                    #'day':Event.day,
+            }
+        else:
+            res = {
+                'Found':'false'
+                #'day':Event.day,
+            }
+    else:
+        res = {
+            'Found':'false'
+                #'day':Event.day,
+        }
+    return JsonResponse(res)

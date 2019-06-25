@@ -278,6 +278,28 @@ def invite(request):
         else:
             return JsonResponse({'Invite': 'event or relationship not found'})
 
+def myInvitations(request):
+    u2 = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+    ins = invites.objects.all().filter(u2=u2, seen=False)
+    if(ins):
+        Invs = [{} for _ in range(len(ins))]
+        for i in range(0,len(ins)):
+            Event = ins[i].event
+            Invs[i]['name']=Event.name
+            Invs[i]['Description']=Event.description
+            Invs[i]['location']=Event.location
+            Invs[i]['city']=Event.city
+            Invs[i]['id']=Event.id
+            Invs[i]['booking']= str(Event.booking)
+            Invs[i]['CreatorID']=Event.Creator.id
+            Invs[i]['invitationId']=ins[i].id
+        res = {
+            'Found':'True',
+            'Events':Invs
+                #'day':Event.day,
+        }
+        return JsonResponse(res)
+    return JsonResponse({'Found':'False'})
 
 def CreateEvent(request): #EDIT NEEDED
     if request.method == 'POST':
@@ -345,7 +367,8 @@ def Find(request):
     if(Events):
         E = [{} for _ in range(len(Events))]
         for i in range(0,len(Events)):
-            E[i]['Name']=str(Events[i].name),
+            E[i]['id']=Events[i].id
+            E[i]['Name']=Events[i].name
             E[i]['description']=Events[i].description
             E[i]['location']=Events[i].location
             E[i]['city']=Events[i].city
@@ -716,6 +739,27 @@ def showFriends(request):
         else:
             res = {'requests': 'none'}
         return JsonResponse(res)
+
+def newsfeed(request):
+    if request.method == 'GET':
+        with connection.cursor() as cursor:
+            cursor.execute("""select distinct on(user_id,id,type) * from ((select '1' as type,et.name as name1,e.name,e.description,e."dayCreated",e.id,up.user_id,e.timeFrom,e.timeTo from "Eventak_events" AS e JOIN "Eventak_events_EventTypes" AS eet ON e.id=eet.events_id JOIN "Eventak_userpref" AS up ON eet.eventtypes_id = up."eType_id" and up.user_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_eventtypes" AS et ON et.id = eet.eventtypes_id ORDER BY e."dayCreated" DESC NULLS LAST) UNION (select '2' as type,u."displayName" as name1,e.name,e.description,e."dayCreated",e.id,u.id,e.timeFrom,e.timeTo from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id WHERE NOT EXISTS (select '1' as type,et.name as name1,e.name,e.description,e."dayCreated",e.id,up.user_id,e.timeFrom,e.timeTo from "Eventak_events" AS e JOIN "Eventak_events_EventTypes" AS eet ON e.id=eet.events_id JOIN "Eventak_userpref" AS up ON eet.eventtypes_id = up."eType_id" and up.user_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_eventtypes" AS et ON et.id = eet.eventtypes_id ORDER BY e."dayCreated" DESC NULLS LAST) ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) UNION (SELECT DISTINCT ON(u1_id,u2_id,event_id) '3' as type,u."displayName" as name1,e.name,e.description,e."dayCreated",e.id,u.id,e.timeFrom,e.timeTo FROM "Eventak_events" as e JOIN "Eventak_userevent" as ue ON e.id = ue.event_id JOIN "Eventak_relstat" AS rel ON rel.u2_id = ue.user_id AND rel.stat = 5 AND rel.u1_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_users" AS u ON rel.u2_id = u.id WHERE NOT EXISTS (select '2' as type,u."displayName" as name1,e.name,e.description,e."dayCreated",e.id,u.id,e.timeFrom,e.timeTo from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) ORDER BY u1_id, u2_id, event_id, ue.time DESC NULLS LAST, rel.time DESC NULLS LAST)) as foo ORDER BY type""")
+            news = namedtuplefetchall(cursor)
+            if(news):
+                newsRes = [{} for _ in range(len(news))]
+                for i in range(0,len(news)):
+                    newsRes[i]['id'] = news[i].id
+                    newsRes[i]['type '] = news[i].type
+                    newsRes[i]['user_id'] = news[i].user_id
+                    newsRes[i]['name1'] = news[i].name1
+                    newsRes[i]['name2'] = news[i].name
+                    newsRes[i]['description'] = news[i].description
+                    newsRes[i]['dayCreated'] = news[i].dayCreated
+                    newsRes[i]['timeFrom'] = news[i].timeFrom
+                    newsRes[i]['timeTo'] = news[i].timeTo
+                res = {'Found':'True', 'news':newsRes}
+                return JsonResponse(res)
+            return JsonResponse({'Found':'True'})
 
 def calcDay(date):
     d = date.split('-')
