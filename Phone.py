@@ -246,7 +246,7 @@ def showFriends(request):
             if(fRel):
                 usRes = [{} for _ in range(len(fRel))]
                 for i in range(0,len(fRel)):
-                    ru = Users.objects.get(id=fRel[i].id)
+                    ru = Users.objects.all().get(id=fRel[i].u2.id)
                     usRes[i]['id'] = str(ru.id)
                     usRes[i]['email'] = ru.email
                     usRes[i]['username'] = ru.username
@@ -295,6 +295,8 @@ def myInvitations(request):
             Invs[i]['booking']= str(Event.booking)
             Invs[i]['CreatorID']=Event.Creator.id
             Invs[i]['invitationId']=ins[i].id
+            Invs[i]['invitor']=ins[i].u1.displayName
+            Invs[i]['invitorId']=ins[i].u1.id
         res = {
             'Found':'True',
             'Events':Invs

@@ -93,6 +93,11 @@ class UserEvent(models.Model):
     view = models.BooleanField(null=False, blank=False)
     time = models.DateTimeField(null=False, blank=False)
 
+class ticket(models.Model):
+    ue = models.ForeignKey('UserEvent', on_delete=models.CASCADE, null=False, blank=False)
+    CipherText = models.TextField(null=False, blank=False)
+    seat = models.TextField(max_length=10)
+
 class invites(models.Model):
     u1 = models.ForeignKey('Users', related_name= 'fr', on_delete=models.CASCADE)  #from
     u2 = models.ForeignKey('Users', related_name= 'to', on_delete=models.CASCADE)  #to

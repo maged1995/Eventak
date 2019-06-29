@@ -570,13 +570,13 @@
       }
     });
 
-    var curPage = "/index/";
-    $("#loadbasic").load("/index/");
+    var curPage = "/feeds/";
+    $("#loadbasic").load("/feeds/");
 
     $(document).ready(function(){
       var myIndex = 0;
-      var curPage = "/index/";
-      $("#loadbasic").load("/index/");
+      var curPage = "/feeds/";
+      $("#loadbasic").load("/feeds/");
       carousel();
       function carousel() {
           if(curPage=="/index/"){
@@ -611,9 +611,9 @@
       }
 
       $("#index").click(function(){
-        if (curPage != "/index/"){
-          curPage = "/index/";
-          $("#loadbasic").load("/index/");
+        if (curPage != "/feeds/"){
+          curPage = "/feeds/";
+          $("#loadbasic").load("/feeds/");
         }
       });
 
