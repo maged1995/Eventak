@@ -227,10 +227,10 @@
           headers: {'X-CSRFToken':'{{ csrf_token }}'},
           success: function(result) {
             var friendsList = "";
-            alert(JSON.stringify(result["requests"]));
+            //alert(JSON.stringify(result["requests"]));
             result["requests"].forEach(function(i){
               friendsList += "<div>"+i["name"]+"<button onclick='invite("+i["id"]+","+evID+")'>Invite</button></div>";
-              alert(friendsList);
+              //alert(friendsList);
             });
                 $("#friendsToInvite"+evID).html(friendsList);
           }
@@ -247,7 +247,7 @@
             'uidR':uid,
           },
           success: function(result) {
-            alert(result['Invite']);
+            //alert(result['Invite']);
           }
       });
     }
@@ -542,7 +542,7 @@
     }
 
     function eventCreate(mark){
-      alert(JSON.stringify(EvPrefs));
+      //alert(JSON.stringify(EvPrefs));
       $.ajax({
           url: '/EventCreate/',
           type: 'POST',
@@ -689,17 +689,17 @@
               type: 'GET',
               success: function(result) {
                 $("#loadbasic").html(result)
-                alert("pass");
+                //alert("pass");
                 $(".cancelRes").click(function(){
                   var elem = $(this).parent().parent().attr('id');
-                  alert(elem);
+                  //alert(elem);
                   $.ajax({
                       url: '/cancelRes/' + elem + '/',
                       type: 'DELETE',
                       headers: {'X-CSRFToken':'{{ csrf_token }}'},
                       success: function(result) {
                           $("#"+elem).html(result['request']);
-			alert(result['request']);
+			//alert(result['request']);
                       }
                   });
                 });
@@ -715,10 +715,10 @@
               type: 'GET',
               success: function(result) {
                 $("#loadbasic").html(result)
-                alert("pass");
+                //alert("pass");
                 $(".deleteEv").click(function(){
                   var elem = $(this).parent().parent().attr('id');
-                  alert(elem);
+                  //alert(elem);
                   $("#"+elem).remove();
                   $.ajax({
                       url: '/cancelEv/' + elem + '/',
