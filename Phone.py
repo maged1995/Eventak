@@ -9,12 +9,16 @@ https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template import loader
-from Eventak.models import Users, RelStat, events, UserEvent, invites
+from Eventak.models import Users, RelStat, events, UserEvent, invites, ticket
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from django.db import connection
 from . import views
-import string, django
+import string, django, json
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+from base64 import b64decode
+from base64 import b64encode
 
 def login(request):
     username = request.GET.get('username')
@@ -64,8 +68,8 @@ def attend(request):
     if request.method == 'GET':
         u = Users.objects.get(id=request.GET.get("myID"))
         e = events.objects.get(id=request.GET.get("evID"))
-        ue = UserEvent.objects.all().filter(user=u, event=e)
-        if not len(ue)>0:
+        ue = UserEvent.objects.all().filter(user=u, event=e).order_by('-time')
+        if not len(ue)>0 or ue[0] != 2:
             newGo = UserEvent(user=u, event=e, stat=2, view=True, time = django.utils.timezone.now())
             newGo.save()
             return JsonResponse({'Attend': 'success'})
@@ -339,3 +343,35 @@ def displayReservations(request):
                 #'day':Event.day,
         }
     return JsonResponse(res)
+
+def createTicket(request):
+    us = Users.objects.get(id=request.GET.get('myID'))
+    e = events.objects.get(id=request.GET.get('eid'))
+    ue = UserEvent.objects.all().filter(user=us, event=e).order_by('-time')
+    if(ue and ue[0].stat == 2):
+        newtick = ticket(ue=ue[0], CipherText=request.GET.get('CT'))
+        newtick.save()
+        return JsonResponse({'ticket': 'success'})
+    else:
+        return JsonResponse({'ticket': 'failure'})
+
+def verifyTicket(request):
+    us = Users.objects.get(id=request.GET.get('myID'))
+    e = events.objects.get(id=request.GET.get('eid'))
+    ue = UserEvent.objects.all().filter(user=us, event=e).order_by('-time')
+    if(ue):
+        t = ticket.objects.all().filter(ue=ue[0])
+        privkeyin = ''.join(request.GET.get('privKey'))
+        privkey = privkeyin.replace(' ', '+')
+        key = b64decode(privkey)
+        key = RSA.import_key(key)
+        cipher = PKCS1_v1_5.new(key)
+        print(cipher)
+        cn = ''.join(t[0].CipherText)
+        c = cn.replace(' ', '+')
+        plaintext = cipher.decrypt(b64decode(c), "Error while decrypting")
+        usInf = json.loads(plaintext.decode('utf8'))
+        if(us.id == usInf['id'] and us.username == usInf['username'] and us.displayName == usInd['displayName']):
+            return JsonResponse({'ticket': 'verified', 'user':usInf})
+        else:
+            return JsonResponse({'ticket': 'Not Verified', 'user':usInf})

@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block content %}
+
+<h1>Invitations</h1>
+{% for i in invitations %}
+{{i.senderId}}
+{{i.senderName}}
+{{i.eventId}}
+{{i.eventName}}<br/>
+{% endfor %}
+
+<h1>Requests</h1>
+{% for f in FriendRequests %}
+{{f.senderId}}
+{{f.senderName}}<br/>
+{% endfor %}
+
+{% endblock %}

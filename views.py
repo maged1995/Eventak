@@ -764,6 +764,29 @@ def newsfeed(request):
                 return HttpResponse(template.render(res, request))
             return JsonResponse({'Found':'False'})
 
+def notifications(request):
+    us =  Users.objects.get(id = request.session['UserInfo']['UserInfo']['id'])
+    with connection.cursor() as cursor:
+        template = loader.get_template('notifications.html')
+        invs = invites.objects.all().filter(u2=us).order_by('u1','u2','event','-time').distinct('u1','u2','event')
+        cursor.execute("""select * from (select DISTINCT ON(u1_id,u2_id) * from "Eventak_relstat" where u1_id = """ +str(request.session['UserInfo']['UserInfo']['id'])+ """ GROUP BY id,u1_id,u2_id ORDER BY u1_id,u2_id,time DESC NULLS LAST) as rel where stat = 3""")
+        reqs = namedtuplefetchall(cursor)
+        if(invs or reqs):
+            invRes = [{} for _ in range(len(invs))]
+            for i in range(0,len(invs)):
+                invRes[i]['senderId'] = invs[i].u1.id
+                invRes[i]['senderName'] = invs[i].u1.displayName
+                invRes[i]['eventId'] = invs[i].event.id
+                invRes[i]['eventName'] = invs[i].event.name
+            reqRes = [{} for _ in range(len(reqs))]
+            for i in range(0,len(reqs)):
+                ru = Users.objects.get(id = reqs[i].u1_id)
+                reqRes[i]['senderId'] = reqs[i].id
+                reqRes[i]['senderName'] = ru.displayName
+            res = {'request':'success', 'invitations':invRes, 'FriendRequests':reqRes}
+            return HttpResponse(template.render(res, request))
+        return HttpResponse(template.render({'request':'success', 'invitations':'None', 'FriendRequests':'None'}, request))
+
 def calcDay(date):
     d = date.split('-')
     day = int(int(d[2])+7)%31

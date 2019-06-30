@@ -14,7 +14,13 @@
         </div>
         <div class="col-md-1"></div>
       </div>
-      <div class="col-md-2 bg-light" onclick="OpenCloseMap()" style="opacity: 0.0"></div>
+      <div class="col-md-2" style="background: rgba(76, 175, 80, 0.0)" height="100%">
+        <div class="col-md-1"></div>
+        <div class="col-md-12 bg-secondary main" id="loadbasic2" height="100%">
+
+        </div>
+        <div class="col-md-1"></div>
+      </div>
 		</div>
 	</body>
   <script>
@@ -577,6 +583,7 @@
       var myIndex = 0;
       var curPage = "/feeds/";
       $("#loadbasic").load("/feeds/");
+      $("#loadbasic2").load("/notifs/");
       carousel();
       function carousel() {
           if(curPage=="/index/"){
