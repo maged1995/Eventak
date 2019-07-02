@@ -341,7 +341,7 @@ def CreateEvent(request): #EDIT NEEDED
             request.session['requestedLocation'] = res
             form = datetimeform()
             template = loader.get_template("EventCreate.html")
-            return HttpResponse(template.render({'form': form}, request))
+            return HttpResponse(template.render({'form': form, 'res':res}, request))
         else:
             return HttpResponse('Please Sign in')
 
