@@ -576,12 +576,14 @@ def UserPage(request):
                 'load':'success',
                 'name':u.displayName,
                 'prefs':EvT,
+                'prof':u.profilePic,
                 'form':UserProfilePic(),
             }
         else:
             res = {
                 'load':'success',
                 'name':u.displayName,
+                'prof':u.profilePic,
                 'form':UserProfilePic(),
             }
         template = loader.get_template('UserPage.html')
@@ -786,6 +788,14 @@ def notifications(request):
             res = {'request':'success', 'invitations':invRes, 'FriendRequests':reqRes}
             return HttpResponse(template.render(res, request))
         return HttpResponse(template.render({'request':'success', 'invitations':'None', 'FriendRequests':'None'}, request))
+
+def ProfImgAdd(request):
+    if request.method == 'POST':
+        #form = UserProfilePic(data=request.POST, files=request.FILES)
+        us =  Users.objects.get(id = request.session['UserInfo']['UserInfo']['id'])
+        us.profilePic = request.FILES['img']
+        us.save()
+        return JsonResponse({"image":"Saved"})
 
 def calcDay(date):
     d = date.split('-')

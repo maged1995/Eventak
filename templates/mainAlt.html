@@ -381,6 +381,25 @@
       });
     }
 
+    function addImage(){
+      event.preventDefault();
+      var data = new FormData($('#file-upload-form').get(0));
+      console.log(data)
+
+$.ajax({
+    url: '/updateProfilePic/',
+    type: 'POST',
+    data: data,
+    headers: {'X-CSRFToken':'{{ csrf_token }}'},
+    cache: false,
+    processData: false,
+    contentType: false,
+    success: function(data) {
+        alert(data);
+    }
+});
+return false;
+    }
     var ClickEventHandler = function(map) {
         this.map = map;
 	this.placesService = new google.maps.places.PlacesService(map);
