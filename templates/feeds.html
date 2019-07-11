@@ -6,19 +6,19 @@
 <div style="background-color: rgba(108, 117, 125,0.7)!important">
 {% if n.type == "1" %}
 {{n.dayCreated}}<br>
-your Friend {{n.name1}}{{n.u_id}} Created a new event <a href="#">{{n.name2}}</a>{{n.e_id}}<br />
+your Friend {{n.name1}}{{n.u_id}} Created a new event <a href="." onclick="openEvent({{n.e_id}})">{{n.name2}}</a>{{n.e_id}}<br />
 {{n.description}}
 {{n.timeFrom}} {{n.timeTo}}
 <hr>
 {% elif n.type == "2" %}
 {{n.dayCreated}}<br>
-{{n.name1}}{{n.u_id}} is going to attend <a href="#">{{n.name2}}</a>{{n.e_id}}<br />
+{{n.name1}}{{n.u_id}} is going to attend <a href="." onclick="openEvent({{n.e_id}})">{{n.name2}}</a>{{n.e_id}}<br />
 {{n.description}}
 {{n.timeFrom}} {{n.timeTo}}
 <hr>
 {% elif n.type == "3" %}
 {{n.dayCreated}}<br>
-a {{n.name1}} event <a href="#">{{n.name2}}</a>{{n.e_id}} has been created<br />
+a {{n.name1}} event <a href="." onclick="openEvent({{n.e_id}})">{{n.name2}}</a>{{n.e_id}} has been created<br />
 {{n.description}}
 {{n.timeFrom}} {{n.timeTo}} <hr>
 {% endif %}

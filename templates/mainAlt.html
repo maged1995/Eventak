@@ -381,6 +381,11 @@
       });
     }
 
+    function openEvent(id){
+      OpenCloseMap();
+      google.maps.event.trigger(activeEventsMarkers.filter(obj => {return obj.evID === id})[0], 'click');
+    }
+
     function addImage(){
       event.preventDefault();
       var data = new FormData($('#file-upload-form').get(0));
