@@ -566,28 +566,35 @@ def addPref(request):
 def UserPage(request):
     u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
     if u:
+        res = {
+            'load':'success',
+            'name':u.displayName,
+            'form':UserProfilePic(),
+        }
+        if u.profilePic:
+            res['prof'] = u.profilePic
         up = UserPref.objects.all().filter(user = u, isPref=True)
         if up:
             EvT = [{} for _ in range(len(up))]
             for i in range(0,len(up)):
                 EvT[i]['id'] = up[i].eType.id
                 EvT[i]['name'] = up[i].eType.name
-            res = {
-                'load':'success',
-                'name':u.displayName,
-                'prefs':EvT,
-                'form':UserProfilePic(),
-            }
-            if u.profilePic:
-                res['prof'] = u.profilePic
-        else:
-            res = {
-                'load':'success',
-                'name':u.displayName,
-                'form':UserProfilePic(),
-            }
-            if u.profilePic:
-                res['prof'] = u.profilePic
+            res['prefs'] = EvT
+        evs = events.objects.all().filter(Creator = u).order_by('-time')
+        if evs:
+            Evs = [{} for _ in range(len(evs))]
+            for i in range(0,len(evs)):
+                Evs[i]['id'] = evs[i].id
+                Evs[i]['name'] = evs[i].name
+            res['eventsCreator'] = Evs
+        ue1 = UserEvent.objects.all().filter(user = u).order_by('-time')
+        ue = UserEvent.objects.all().filter(id__in=ue1).distinct('user','event')
+        if ue:
+            Ue = [{} for _ in range(len(ue))]
+            for i in range(0,len(ue)):
+                Ue[i]['id'] = ue[i].event.id
+                Ue[i]['name'] = ue[i].event.name
+            res['eventsRel'] = Evs
         template = loader.get_template('UserPage.html')
         return HttpResponse(template.render(res, request))
     else:
@@ -749,7 +756,7 @@ def showFriends(request):
 def newsfeed(request):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-            cursor.execute("""select distinct on(u_id,e_id,type) * from ((select '1' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) UNION (SELECT DISTINCT ON(u1_id,u2_id,event_id) '2' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" FROM "Eventak_events" as e JOIN "Eventak_userevent" as ue ON e.id = ue.event_id JOIN "Eventak_relstat" AS rel ON rel.u2_id = ue.user_id AND rel.stat = 5 AND rel.u1_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_users" AS u ON rel.u2_id = u.id WHERE NOT EXISTS (select '1' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) ORDER BY u1_id, u2_id, event_id, ue.time DESC NULLS LAST, rel.time DESC NULLS LAST) UNION (select '3' as type,et.name as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,up.user_id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_events_EventTypes" AS eet ON e.id=eet.events_id JOIN "Eventak_userpref" AS up ON eet.eventtypes_id = up."eType_id" and up.user_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_eventtypes" AS et ON et.id = eet.eventtypes_id WHERE NOT EXISTS (SELECT DISTINCT ON(u1_id,u2_id,event_id) '2' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" FROM "Eventak_events" as e JOIN "Eventak_userevent" as ue ON e.id = ue.event_id JOIN "Eventak_relstat" AS rel ON rel.u2_id = ue.user_id AND rel.stat = 5 AND rel.u1_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_users" AS u ON rel.u2_id = u.id WHERE NOT EXISTS (select '1' as type,u."displayName" as name1,e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) ORDER BY u1_id, u2_id, event_id, ue.time DESC NULLS LAST, rel.time DESC NULLS LAST) ORDER BY e."dayCreated" DESC NULLS LAST)) as foo ORDER BY type""")
+            cursor.execute("""select distinct on(u_id,e_id,type) * from ((select '1' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) UNION (SELECT DISTINCT ON(u1_id,u2_id,event_id) '2' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" FROM "Eventak_events" as e JOIN "Eventak_userevent" as ue ON e.id = ue.event_id JOIN "Eventak_relstat" AS rel ON rel.u2_id = ue.user_id AND rel.stat = 5 AND rel.u1_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_users" AS u ON rel.u2_id = u.id WHERE NOT EXISTS (select '1' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_relstat" AS rel on e."Creator_id" = rel.u2_id and rel.u1_id = """ + str(request.session['UserInfo']['UserInfo']['id']) + """ AND rel.stat = 5 JOIN "Eventak_users" AS u ON u.id = rel.u2_id ORDER BY rel.time DESC NULLS LAST, e."dayCreated" DESC NULLS LAST) ORDER BY u1_id, u2_id, event_id, ue.time DESC NULLS LAST, rel.time DESC NULLS LAST) UNION (select '3' as type,et.name as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,up.user_id as u_id,e."timeFrom",e."timeTo" from "Eventak_events" AS e JOIN "Eventak_events_EventTypes" AS eet ON e.id=eet.events_id JOIN "Eventak_userpref" AS up ON eet.eventtypes_id = up."eType_id" and up.user_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_eventtypes" AS et ON et.id = eet.eventtypes_id WHERE NOT EXISTS (SELECT DISTINCT ON(u1_id,u2_id,event_id) '2' as type,u."displayName" as name1,e."locLong",e."locLat",e.name,e.description,e."dayCreated",e.id as e_id,u.id as u_id,e."timeFrom",e."timeTo" FROM "Eventak_events" as e JOIN "Eventak_userevent" as ue ON e.id = ue.event_id JOIN "Eventak_relstat" AS rel ON rel.u2_id = ue.user_id AND rel.stat = 5 AND rel.u1_id= """ + str(request.session['UserInfo']['UserInfo']['id']) + """ JOIN "Eventak_users" AS u ON rel.u2_id = u.id ORDER BY u1_id, u2_id, event_id, ue.time DESC NULLS LAST, rel.time DESC NULLS LAST) ORDER BY e."dayCreated" DESC NULLS LAST)) as foo ORDER BY type""")
             news = namedtuplefetchall(cursor)
             if(news):
                 newsRes = [{} for _ in range(len(news))]
