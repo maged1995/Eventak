@@ -57,6 +57,7 @@ class events(models.Model):
     ifPlaceNum = models.BooleanField(null=False, blank=False)
     placeNum = models.IntegerField(null=True, blank=True)  #### check number of of users currently reserved
     EventTypes = models.ManyToManyField('EventTypes')
+    cancelled = models.BooleanField(null=False, blank=False)
     dayCreated = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return self.name

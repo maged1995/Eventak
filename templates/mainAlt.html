@@ -680,7 +680,7 @@ return false;
       $("#userPage").click(function(){
         if (curPage != "/userPage/"){
           curPage = "/userPage/";
-          $("#loadbasic").load(curPage);
+          $("#loadbasic").load(curPage + '{{request.session.UserInfo.UserInfo.id}}');
         }
       });
 

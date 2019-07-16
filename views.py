@@ -317,7 +317,7 @@ def CreateEvent(request): #EDIT NEEDED
                    city= request.POST.get('city'),
                    locLong=request.session['requestedLocation']['lng'],
                    locLat=request.session['requestedLocation']['lat'],
-                   booking='True', Creator=u,
+                   booking='True', cancelled = False, Creator=u,
                    timeFrom=request.POST.get('Date_From'), timeTo=request.POST.get('Date_To'),
                    ifPlaceNum=True, placeNum=60,
                    dayCreated=django.utils.timezone.now())
@@ -400,9 +400,9 @@ def map(request):
     if not 'state' in request.session:
         state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
         request.session['state']=state
-    context = {
-
-    }
+    context = {}
+    if 'UserInfo' in request.session:
+        context['userId'] = request.session['UserInfo']['UserInfo']['id']
     request.META["CSRF_COOKIE_USED"] = True
     return HttpResponse(template.render(context, request))
 
@@ -422,8 +422,8 @@ def displayMyEvents(request):
                 'locLong':Events[i].locLong,
                 'locLat':Events[i].locLat
             }
-            E[i]['timeFrom']=Events[i].timeFrom,
-            E[i]['timeTo']=Events[i].timeTo,
+            E[i]['timeFrom']=Events[i].timeFrom
+            E[i]['timeTo']=Events[i].timeTo
             E[i]['booking']= str(Events[i].booking)
             E[i]['Creator']=Events[i].Creator.id
         print("pass")
@@ -563,8 +563,8 @@ def addPref(request):
     else:
         return JsonResponse({'request':'User not Found'})
 
-def UserPage(request):
-    u = Users.objects.get(id=request.session['UserInfo']['UserInfo']['id'])
+def UserPage(request, id):
+    u = Users.objects.get(id=id)
     if u:
         res = {
             'load':'success',
@@ -586,6 +586,16 @@ def UserPage(request):
             for i in range(0,len(evs)):
                 Evs[i]['id'] = evs[i].id
                 Evs[i]['name'] = evs[i].name
+                Evs[i]['description']=evs[i].description
+                Evs[i]['location']=evs[i].location
+                Evs[i]['city']=evs[i].city
+                Evs[i]['Map']={
+                    'locLong':evs[i].locLong,
+                    'locLat':evs[i].locLat
+                }
+                Evs[i]['timeFrom']=evs[i].timeFrom
+                Evs[i]['timeTo']=evs[i].timeTo
+                Evs[i]['booking']= str(evs[i].booking)
             res['eventsCreator'] = Evs
         ue1 = UserEvent.objects.all().filter(user = u).order_by('-time')
         ue = UserEvent.objects.all().filter(id__in=ue1).distinct('user','event')
@@ -594,6 +604,16 @@ def UserPage(request):
             for i in range(0,len(ue)):
                 Ue[i]['id'] = ue[i].event.id
                 Ue[i]['name'] = ue[i].event.name
+                Evs[i]['description']=ue[i].event.description
+                Evs[i]['location']=ue[i].event.location
+                Evs[i]['city']=ue[i].event.city
+                Evs[i]['Map']={
+                    'locLong':ue[i].event.locLong,
+                    'locLat':ue[i].event.locLat
+                }
+                Evs[i]['timeFrom']=ue[i].event.timeFrom
+                Evs[i]['timeTo']=ue[i].event.timeTo
+                Evs[i]['booking']= str(ue[i].event.booking)
             res['eventsRel'] = Evs
         template = loader.get_template('UserPage.html')
         return HttpResponse(template.render(res, request))
