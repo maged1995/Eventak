@@ -317,7 +317,7 @@ def CreateEvent(request): #EDIT NEEDED
                    city= request.POST.get('city'),
                    locLong=request.session['requestedLocation']['lng'],
                    locLat=request.session['requestedLocation']['lat'],
-                   booking='True', cancelled = False, Creator=u,
+                   booking='True', Creator=u, #cancelled = False, 
                    timeFrom=request.POST.get('Date_From'), timeTo=request.POST.get('Date_To'),
                    ifPlaceNum=True, placeNum=60,
                    dayCreated=django.utils.timezone.now())
@@ -569,6 +569,7 @@ def UserPage(request, id):
         res = {
             'load':'success',
             'name':u.displayName,
+            'id':int(id),
             'form':UserProfilePic(),
         }
         if u.profilePic:
@@ -580,7 +581,7 @@ def UserPage(request, id):
                 EvT[i]['id'] = up[i].eType.id
                 EvT[i]['name'] = up[i].eType.name
             res['prefs'] = EvT
-        evs = events.objects.all().filter(Creator = u).order_by('-time')
+        evs = events.objects.all().filter(Creator = u).order_by('-dayCreated')
         if evs:
             Evs = [{} for _ in range(len(evs))]
             for i in range(0,len(evs)):

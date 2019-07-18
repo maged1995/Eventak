@@ -1,6 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 <title>{{p.name}}</title>
+<div class="row divider">
 <div class="col-md-3 bg-secondary">
   <h1>{{name}}</h1>
   <img src="{{prof.url}}" alt="img" style="max-width:200px">
@@ -16,18 +17,48 @@
   {{p.id}} <br>
   {% endfor %}
   </div>
-  <input type="text" id="prefField" onkeydown="searchPreference()"/>
+  {% if id == request.session.UserInfo.UserInfo.id %}<input type="text" id="prefField" onkeydown="searchPreference()"/>
   <button onClick="createPref()">Add New Preference</button>
   <div class="loader" style="display: none;"></div>
-  <div id="PrefAvail"></div>
+  <div id="PrefAvail"></div>{% endif %}
 </div>
-<div class="col-md-7 bg-secondary">
+<div class="col-md-9 bg-secondary">
+  <h2>Events Created</h2>
   {% for ec in eventsCreator %}
-  {{ec.id}} {{ec.name}} <br>
+  <div style="background-color: rgba(108, 117, 125,0.7)!important">
+  {{ec.id}} {{ec.name}}
+  {{ec.CreatorID}}
+  {{ec.CreatorName}}
+  {{ec.description}}
+  {{ec.location}}
+  <div class='ifBooking'>{{ec.booking}}</div>
+  {{ec.timeFrom}}
+  {{ec.timeTo}}
+  {% if ec.placeNum > '0' %}
+    {{ec.placeNum}}
+    {{ec.numOfGoing}}
+  {% endif %}
+  <hr>
+  </div>
   {% endfor %}
-
+  <h2>Relation with Events:</h2>
   {% for er in eventsRel %}
-  {{er.id}} {{er.name}} <br>
+  <div style="background-color: rgba(108, 117, 125,0.7)!important">
+  {{er.id}} {{er.name}}
+  {{er.CreatorID}}
+  {{er.CreatorName}}
+  {{er.description}}
+  {{er.location}}
+  <div class='ifBooking'>{{er.booking}}</div>
+  {{er.timeFrom}}
+  {{er.timeTo}}
+  {% if er.placeNum > '0' %}
+    {{er.placeNum}}
+    {{er.numOfGoing}}
+  {% endif %}
+  <hr>
+  </div>
   {% endfor %}
+</div>
 </div>
 {% endblock %}
