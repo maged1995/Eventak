@@ -3,8 +3,8 @@
 <title>{{p.name}}</title>
 <div class="row divider">
 <div class="col-md-3 bg-secondary">
+  <div class="itemTitle"><h1>{{name}}</h1></div>
   <div class="item">
-    <h1>{{name}}</h1>
     <img src="{{prof.url}}" alt="img" style="max-width:200px">
     <form action="/updateProfilePic/" method="post" id="file-upload-form" enctype="multipart/form-data"> {% csrf_token %}
         {{ form }}
@@ -12,8 +12,8 @@
     </form>
   </div>
 <!--<button>onClick="updateProfPic()">update</button>-->
+  <div class="itemTitle"><h3>Preferences:</h3></div>
   <div class="item">
-    <h3>Preferences:</h3>
     <div id="curPrefs">
       {% for p in prefs %}
       {{p.name}}
@@ -27,7 +27,7 @@
   </div>
 </div>
 <div class="col-md-9 bg-secondary">
-  <h2>Events Created</h2>
+  <div class="itemTitle"><h2>Events Created</h2></div>
   {% for ec in eventsCreator %}
   <div class="item">
     {{ec.id}} {{ec.name}}
@@ -42,10 +42,9 @@
       {{ec.placeNum}}
       {{ec.numOfGoing}}
     {% endif %}
-    <hr/>
-  </div>
+    </div>
   {% endfor %}
-  <h2>Relation with Events:</h2>
+  <div class="itemTitle"><h2>Relation with Events:</h2></div>
   {% for er in eventsRel %}
   <div class="item">
     {{er.id}} {{er.name}}
@@ -60,7 +59,6 @@
       {{er.placeNum}}
       {{er.numOfGoing}}
     {% endif %}
-    <hr/>
   </div>
   {% endfor %}
 </div>

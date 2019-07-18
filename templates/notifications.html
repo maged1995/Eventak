@@ -2,7 +2,7 @@
 {% block content %}
 
 
-<div class="item"><h1>Invitations</h1></div>
+<div class="itemTitle"><h1>Invitations</h1></div>
 {% for i in invitations %}
 <div class="item">
   {{i.senderId}}
@@ -12,7 +12,7 @@
 </div>
 {% endfor %}
 
-<div class="item"><h1>Requests</h1></div>
+<div class="itemTitle"><h1>Requests</h1></div>
 {% for f in FriendRequests %}
 <div class="item">
   {{f.senderId}}
