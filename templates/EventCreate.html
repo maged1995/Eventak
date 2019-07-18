@@ -2,6 +2,7 @@
 {% block content %}
 <h1 class="title">Create Event</h1>
 {% csrf_token %}
+<div class="item">
   <label for="EventName">Event Name: </label><input type="text" placeholder="EventName" id="EventName"/><br/>
   <label for="description">Description: </label><input type="text" placeholder="description" id="description"/><br/>
   <label for="location">Location: </label><input type="text" placeholder="location" id="location"/><br/>
@@ -14,7 +15,7 @@
   {{ form }}
   <button onClick="eventCreate({{res.mark}})">Create</button>
   <div class="loader" style="display: none;"></div>
-
+</div>
 
 <!-- google, facebook, and other login api's will be here -->
 {% endblock %}

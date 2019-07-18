@@ -3,60 +3,64 @@
 <title>{{p.name}}</title>
 <div class="row divider">
 <div class="col-md-3 bg-secondary">
-  <h1>{{name}}</h1>
-  <img src="{{prof.url}}" alt="img" style="max-width:200px">
-  <form action="/updateProfilePic/" method="post" id="file-upload-form" enctype="multipart/form-data"> {% csrf_token %}
-      {{ form }}
-      <button onclick="addImage()" class="btn btn-primary" id='upload-btn'>Upload</button>
-  </form>
-<!--<button>onClick="updateProfPic()">update</button>-->
-  <h3>Preferences:</h3>
-  <div id="curPrefs">
-  {% for p in prefs %}
-  {{p.name}}
-  {{p.id}} <br>
-  {% endfor %}
+  <div class="item">
+    <h1>{{name}}</h1>
+    <img src="{{prof.url}}" alt="img" style="max-width:200px">
+    <form action="/updateProfilePic/" method="post" id="file-upload-form" enctype="multipart/form-data"> {% csrf_token %}
+        {{ form }}
+        <button onclick="addImage()" class="btn btn-primary" id='upload-btn'>Upload</button>
+    </form>
   </div>
-  {% if id == request.session.UserInfo.UserInfo.id %}<input type="text" id="prefField" onkeydown="searchPreference()"/>
-  <button onClick="createPref()">Add New Preference</button>
-  <div class="loader" style="display: none;"></div>
-  <div id="PrefAvail"></div>{% endif %}
+<!--<button>onClick="updateProfPic()">update</button>-->
+  <div class="item">
+    <h3>Preferences:</h3>
+    <div id="curPrefs">
+      {% for p in prefs %}
+      {{p.name}}
+      {{p.id}} <br>
+      {% endfor %}
+    </div>
+    {% if id == request.session.UserInfo.UserInfo.id %}<input type="text" id="prefField" onkeydown="searchPreference()"/>
+    <button onClick="createPref()">Add New Preference</button>
+    <div class="loader" style="display: none;"></div>
+    <div id="PrefAvail"></div>{% endif %}
+  </div>
 </div>
 <div class="col-md-9 bg-secondary">
   <h2>Events Created</h2>
   {% for ec in eventsCreator %}
-  <div style="background-color: rgba(108, 117, 125,0.7)!important">
-  {{ec.id}} {{ec.name}}
-  {{ec.CreatorID}}
-  {{ec.CreatorName}}
-  {{ec.description}}
-  {{ec.location}}
-  <div class='ifBooking'>{{ec.booking}}</div>
-  {{ec.timeFrom}}
-  {{ec.timeTo}}
-  {% if ec.placeNum > '0' %}
-    {{ec.placeNum}}
-    {{ec.numOfGoing}}
-  {% endif %}
-  <hr>
+  <div class="item">
+    {{ec.id}} {{ec.name}}
+    {{ec.CreatorID}}
+    {{ec.CreatorName}}
+    {{ec.description}}
+    {{ec.location}}
+    <div class='ifBooking'>{{ec.booking}}</div>
+    {{ec.timeFrom}}
+    {{ec.timeTo}}
+    {% if ec.placeNum > '0' %}
+      {{ec.placeNum}}
+      {{ec.numOfGoing}}
+    {% endif %}
+    <hr/>
   </div>
   {% endfor %}
   <h2>Relation with Events:</h2>
   {% for er in eventsRel %}
-  <div style="background-color: rgba(108, 117, 125,0.7)!important">
-  {{er.id}} {{er.name}}
-  {{er.CreatorID}}
-  {{er.CreatorName}}
-  {{er.description}}
-  {{er.location}}
-  <div class='ifBooking'>{{er.booking}}</div>
-  {{er.timeFrom}}
-  {{er.timeTo}}
-  {% if er.placeNum > '0' %}
-    {{er.placeNum}}
-    {{er.numOfGoing}}
-  {% endif %}
-  <hr>
+  <div class="item">
+    {{er.id}} {{er.name}}
+    {{er.CreatorID}}
+    {{er.CreatorName}}
+    {{er.description}}
+    {{er.location}}
+    <div class='ifBooking'>{{er.booking}}</div>
+    {{er.timeFrom}}
+    {{er.timeTo}}
+    {% if er.placeNum > '0' %}
+      {{er.placeNum}}
+      {{er.numOfGoing}}
+    {% endif %}
+    <hr/>
   </div>
   {% endfor %}
 </div>

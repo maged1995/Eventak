@@ -3,20 +3,21 @@
 <title>My Events</title>
 <div>
   {% for event in Events %}
-
-  <div id="Ev{{event.id}}">
-    {{event.Name}}
-    {{event.description}}
-    {{event.location}}
-    {{event.timeFrom}}
-    {{event.timeTo}}
-    <div class="updateSection">
-      <button type="button" class="editEv" name="edit">Edit</button>
-      <button type="button" class="deleteEv" name="delete">Delete</button>
+  <div class="item">
+    <div id="Ev{{event.id}}">
+      {{event.Name}}
+      {{event.description}}
+      {{event.location}}
+      {{event.timeFrom}}
+      {{event.timeTo}}
+      <div class="updateSection">
+        <button type="button" class="editEv" name="edit">Edit</button>
+        <button type="button" class="deleteEv" name="delete">Delete</button>
+      </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
 
+  </div>
 </div>
 <br/>
 

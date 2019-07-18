@@ -1,18 +1,23 @@
 {% extends "main.html" %}
 {% block content %}
 
-<h1>Invitations</h1>
+
+<div class="item"><h1>Invitations</h1></div>
 {% for i in invitations %}
-{{i.senderId}}
-{{i.senderName}}
-{{i.eventId}}
-{{i.eventName}}<br/>
+<div class="item">
+  {{i.senderId}}
+  {{i.senderName}}
+  {{i.eventId}}
+  {{i.eventName}}
+</div>
 {% endfor %}
 
-<h1>Requests</h1>
+<div class="item"><h1>Requests</h1></div>
 {% for f in FriendRequests %}
-{{f.senderId}}
-{{f.senderName}}<br/>
+<div class="item">
+  {{f.senderId}}
+  {{f.senderName}}
+</div>
 {% endfor %}
 
 {% endblock %}

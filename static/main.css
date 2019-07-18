@@ -110,12 +110,18 @@
 			}
 
 
-			
 
 
 
 
 
+
+}
+
+.item {
+  background-color: rgba(108, 117, 125,0.7)!important;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 .row{

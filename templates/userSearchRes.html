@@ -1,6 +1,6 @@
 {% for u in users %}
 
-  <div>
+  <div class="item">
     {% if u.profilePic != "/media/" %}<img src="{{u.profilePic}}" alt="img" style="max-width:50px">{% endif %}
     {{u.name}}
     {{u.username}}
