@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% block content %}
 
-
+{% if invitations %}
 <div class="itemTitle"><h1>Invitations</h1></div>
 {% for i in invitations %}
 <div class="item">
@@ -11,7 +11,9 @@
   {{i.eventName}}
 </div>
 {% endfor %}
+{% endif %}
 
+{% if FriendRequests %}
 <div class="itemTitle"><h1>Requests</h1></div>
 {% for f in FriendRequests %}
 <div class="item">
@@ -19,5 +21,6 @@
   {{f.senderName}}
 </div>
 {% endfor %}
+{% endif %}
 
 {% endblock %}
